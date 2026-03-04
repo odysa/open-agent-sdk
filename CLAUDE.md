@@ -1,0 +1,54 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+bun install              # Install dependencies
+bun run build            # Build (tsc -> dist/)
+bun run dev              # Watch mode build
+bun run check            # Type check without emitting
+bun run lint             # Lint with Biome
+bun run lint:fix         # Lint and auto-fix
+bun run format           # Format with Biome
+bun run ci               # Type check + lint (CI pipeline)
+```
+
+Run examples: `bun run examples/basic.ts`
+
+## Architecture
+
+Open Agent SDK is a provider-agnostic TypeScript SDK for building LLM agents with tools and multi-agent handoffs. It exposes a unified streaming interface (`AsyncGenerator<StreamChunk>`) regardless of backend.
+
+### Core Flow
+
+`run(prompt, config)` -> dynamically imports the provider -> returns `{ stream, chat, close }` (`AgentRun`)
+
+### Provider System (`src/providers/`)
+
+Each provider implements the `Provider` interface (`run`, `chat`, `close`) and is dynamically imported based on `RunConfig.provider`:
+
+- **claude** — wraps `@anthropic-ai/claude-agent-sdk`. Exposes user tools via an in-process MCP server (`createSdkMcpServer`). Tool names follow `mcp__{serverName}__{toolName}` convention.
+- **openai** — wraps `openai` SDK. Converts Zod schemas to JSON Schema via `zodToJsonSchema()`. Implements tool call loop with streaming delta accumulation. Handoffs are synthetic `transfer_to_{name}` function tools that swap the system prompt.
+- **kimi** — wraps `@moonshot-ai/kimi-agent-sdk`. Uses `createSession`/`createExternalTool`. Auto-approves `ApprovalRequest` events.
+
+All three are optional peer dependencies with ambient type declarations in `src/shims.d.ts`.
+
+### Key Types (`src/types.ts`)
+
+- `ToolDef<T>` — tool with Zod schema for parameters and async handler
+- `AgentDef` — agent with prompt, tools, handoff targets, optional MCP servers
+- `StreamChunk` — discriminated union: `text | tool_call | tool_result | handoff | error | done`
+- `RunConfig` — provider selection, agent, additional agents map for handoffs, provider options
+
+### Handoff Pattern
+
+Agents declare `handoffs: string[]` referencing agent names. The runner's `agents` map provides the full definitions. OpenAI/Kimi providers implement handoffs as synthetic `transfer_to_{name}` tools that swap the active agent. Claude provider delegates to the SDK's built-in agent support.
+
+## Conventions
+
+- ESM-only (`"type": "module"`), all imports use `.js` extensions
+- Zod v4 for tool parameter schemas
+- Biome for linting/formatting (2-space indent, 100 char line width, `noExplicitAny: off`)
+- `dist/` is checked into git (pre-built output)
