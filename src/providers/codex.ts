@@ -1,16 +1,12 @@
 import type { RunConfig, StreamChunk } from "../types.js";
+import { importProvider } from "../utils/import-provider.js";
 import type { ProviderBackend } from "./types.js";
 
 export async function createCodexProvider(config: RunConfig): Promise<ProviderBackend> {
-  let CodexClass: any;
-  try {
-    const mod = await import("@openai/codex-sdk");
-    CodexClass = mod.Codex;
-  } catch {
-    throw new Error(
-      "Codex provider requires @openai/codex-sdk. Install it with: bun add @openai/codex-sdk",
-    );
-  }
+  const { Codex: CodexClass } = await importProvider(
+    "@openai/codex-sdk",
+    "bun add @openai/codex-sdk",
+  );
 
   const codex = new CodexClass({
     apiKey: config.providerOptions?.apiKey as string | undefined,
@@ -85,7 +81,8 @@ export async function createCodexProvider(config: RunConfig): Promise<ProviderBa
               break;
             case "error":
               yield { type: "error", error: item.message };
-              break;
+              yield { type: "done", text: fullText };
+              return;
           }
           break;
         }

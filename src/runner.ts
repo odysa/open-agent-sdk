@@ -34,15 +34,15 @@ export async function run(prompt: string, config: RunConfig): Promise<AgentRun> 
 
 /** Convenience: run to completion and return collected text */
 export async function runToCompletion(prompt: string, config: RunConfig): Promise<string> {
-  const provider = await createProvider(config);
+  const { stream, close } = await run(prompt, config);
   let text = "";
 
-  for await (const chunk of provider.run(prompt, config)) {
+  for await (const chunk of stream) {
     if (chunk.type === "text") {
       text += chunk.text;
     }
   }
 
-  await provider.close();
+  await close();
   return text;
 }

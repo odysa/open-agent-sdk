@@ -25,13 +25,17 @@ const calculatorTool = defineTool({
     expression: z.string().describe("Math expression to evaluate"),
   }),
   handler: async ({ expression }) => {
-    try {
-      // Simple eval for demo purposes
-      const result = Function(`"use strict"; return (${expression})`)();
-      return String(result);
-    } catch {
-      return "Error: could not evaluate expression";
-    }
+    // Simple mock calculator for demo — do NOT use eval/Function in production
+    const match = expression.match(/^([\d.]+)\s*([+\-*/])\s*([\d.]+)$/);
+    if (!match) return "Error: only simple expressions like '2 + 3' are supported";
+    const [, a, op, b] = match;
+    const ops: Record<string, (a: number, b: number) => number> = {
+      "+": (a, b) => a + b,
+      "-": (a, b) => a - b,
+      "*": (a, b) => a * b,
+      "/": (a, b) => a / b,
+    };
+    return String(ops[op](Number(a), Number(b)));
   },
 });
 

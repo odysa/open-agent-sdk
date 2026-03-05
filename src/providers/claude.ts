@@ -1,17 +1,12 @@
 import type { AgentDef, RunConfig, StreamChunk, ToolDef } from "../types.js";
+import { importProvider } from "../utils/import-provider.js";
 import type { ProviderBackend } from "./types.js";
 
 export async function createClaudeProvider(config: RunConfig): Promise<ProviderBackend> {
-  let claudeSdk: any;
-  try {
-    claudeSdk = await import("@anthropic-ai/claude-agent-sdk");
-  } catch {
-    throw new Error(
-      "Claude provider requires @anthropic-ai/claude-agent-sdk. Install it with: bun add @anthropic-ai/claude-agent-sdk",
-    );
-  }
-
-  const { query, createSdkMcpServer, tool } = claudeSdk;
+  const { query, createSdkMcpServer, tool } = await importProvider(
+    "@anthropic-ai/claude-agent-sdk",
+    "bun add @anthropic-ai/claude-agent-sdk",
+  );
 
   // Build in-process MCP server for user-defined tools
   const agentTools = config.agent.tools ?? [];

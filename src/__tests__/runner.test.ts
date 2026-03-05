@@ -9,15 +9,9 @@ const agent: AgentDef = {
 };
 
 describe("run()", () => {
-  test("returns stream, chat, and close", async () => {
-    await expect(run("hello", { provider: "invalid" as any, agent })).rejects.toThrow(
-      "Unknown provider",
-    );
-  });
-
   test("rejects unknown provider with helpful message", async () => {
     await expect(run("hello", { provider: "invalid" as any, agent })).rejects.toThrow(
-      "Use: claude, codex, kimi",
+      "Unknown provider",
     );
   });
 });

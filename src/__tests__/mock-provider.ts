@@ -3,6 +3,22 @@ import type { RunConfig, StreamChunk } from "../types.js";
 
 export type MockEvent = StreamChunk;
 
+/** Collect all chunks from a stream */
+export async function collect(stream: AsyncGenerator<StreamChunk>): Promise<StreamChunk[]> {
+  const chunks: StreamChunk[] = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return chunks;
+}
+
+/** Collect only text from a stream */
+export async function collectText(stream: AsyncGenerator<StreamChunk>): Promise<string> {
+  let text = "";
+  for await (const chunk of stream) {
+    if (chunk.type === "text") text += chunk.text;
+  }
+  return text;
+}
+
 /**
  * Creates a mock provider that yields pre-configured events.
  * Use `setEvents` to configure what the next run/chat call returns.

@@ -2,24 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { z } from "zod";
 import { defineAgent } from "../agent.js";
 import { defineTool } from "../tool.js";
-import type { StreamChunk } from "../types.js";
-import { createMockProvider } from "./mock-provider.js";
-
-/** Collect all chunks from a stream */
-async function collect(stream: AsyncGenerator<StreamChunk>): Promise<StreamChunk[]> {
-  const chunks: StreamChunk[] = [];
-  for await (const chunk of stream) chunks.push(chunk);
-  return chunks;
-}
-
-/** Collect only text from a stream */
-async function collectText(stream: AsyncGenerator<StreamChunk>): Promise<string> {
-  let text = "";
-  for await (const chunk of stream) {
-    if (chunk.type === "text") text += chunk.text;
-  }
-  return text;
-}
+import { collect, collectText, createMockProvider } from "./mock-provider.js";
 
 describe("full agent run simulation", () => {
   test("simple text response", async () => {

@@ -52,3 +52,16 @@ Agents declare `handoffs: string[]` referencing agent names. The runner's `agent
 - Zod v4 for tool parameter schemas
 - Biome for linting/formatting (2-space indent, 100 char line width, `noExplicitAny: off`)
 - `dist/` is checked into git (pre-built output)
+
+## Commit & PR Conventions
+
+Use [Conventional Commits](https://www.conventionalcommits.org/). Prefix commit messages and PR titles with a type:
+
+- `feat:` — new feature
+- `fix:` — bug fix
+- `refactor:` — code change that neither fixes a bug nor adds a feature
+- `docs:` — documentation only
+- `test:` — adding or updating tests
+- `chore:` — maintenance (deps, CI, build, etc.)
+
+Examples: `fix: normalize error→done in codex provider`, `refactor: extract shared importProvider helper`

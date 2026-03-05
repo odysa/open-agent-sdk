@@ -1,18 +1,13 @@
 import type { RunConfig, StreamChunk, ToolDef } from "../types.js";
 import { handoffToolName, parseHandoff } from "../utils/handoff.js";
+import { importProvider } from "../utils/import-provider.js";
 import type { ProviderBackend } from "./types.js";
 
 export async function createKimiProvider(config: RunConfig): Promise<ProviderBackend> {
-  let kimiSdk: any;
-  try {
-    kimiSdk = await import("@moonshot-ai/kimi-agent-sdk");
-  } catch {
-    throw new Error(
-      "Kimi provider requires @moonshot-ai/kimi-agent-sdk. Install it with: bun add @moonshot-ai/kimi-agent-sdk",
-    );
-  }
-
-  const { createSession, createExternalTool } = kimiSdk;
+  const { createSession, createExternalTool } = await importProvider(
+    "@moonshot-ai/kimi-agent-sdk",
+    "bun add @moonshot-ai/kimi-agent-sdk",
+  );
 
   const agentTools = config.agent.tools ?? [];
 
