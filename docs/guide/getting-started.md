@@ -87,4 +87,7 @@ for await (const chunk of stream) {
 - See how to define [Tools](/guide/tools) with type-safe parameters
 - Understand the [Streaming](/guide/streaming) interface
 - Build [Multi-Agent Handoffs](/guide/handoffs)
-- Compare [Providers](/guide/providers)
+- Compare [Providers](/guide/providers) and register custom ones
+- Add [Middleware](/guide/middleware) to transform streams
+- Manage [Sessions](/guide/sessions) for multi-turn conversations
+- Get typed responses with [Structured Output](/guide/structured-output)

@@ -59,6 +59,8 @@ interface RunConfig {
   workDir?: string;
   maxTurns?: number;
   signal?: AbortSignal;
+  middleware?: Middleware[];
+  responseSchema?: z.ZodType;
 }
 ```
 
@@ -89,8 +91,86 @@ interface McpServerConfig {
 
 ## Provider
 
-Supported provider backends.
+Supported provider backends. Includes built-in providers and any registered custom providers.
 
 ```typescript
-type Provider = "claude" | "codex" | "kimi";
+type BuiltinProvider = "claude" | "codex" | "kimi";
+type Provider = BuiltinProvider | (string & {});
+```
+
+## Middleware
+
+Stream middleware function.
+
+```typescript
+type Middleware = (
+  stream: AsyncGenerator<StreamChunk>,
+  context: MiddlewareContext,
+) => AsyncGenerator<StreamChunk>;
+```
+
+## MiddlewareContext
+
+Context passed to each middleware function.
+
+```typescript
+interface MiddlewareContext {
+  agent: AgentDef;
+  provider: Provider;
+}
+```
+
+## Session
+
+Session handle for multi-turn conversations.
+
+```typescript
+interface Session {
+  readonly id: string;
+  run(prompt: string, config: RunConfig): Promise<AgentRun>;
+  getHistory(): Promise<Message[]>;
+  clear(): Promise<void>;
+}
+```
+
+## Message
+
+A message in the conversation history.
+
+```typescript
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+```
+
+## SessionStore
+
+Interface for session storage backends.
+
+```typescript
+interface SessionStore {
+  load(sessionId: string): Promise<Message[]>;
+  save(sessionId: string, messages: Message[]): Promise<void>;
+}
+```
+
+## ProviderBackend
+
+Interface that provider implementations must satisfy.
+
+```typescript
+interface ProviderBackend {
+  run(prompt: string, config: RunConfig): AsyncGenerator<StreamChunk>;
+  chat(message: string): AsyncGenerator<StreamChunk>;
+  close(): Promise<void>;
+}
+```
+
+## ProviderFactory
+
+Factory function for custom providers.
+
+```typescript
+type ProviderFactory = (config: RunConfig) => Promise<ProviderBackend>;
 ```

@@ -87,3 +87,33 @@ const { stream } = await run("Hello", { provider, agent });
 ```
 
 Your tools, agents, and stream processing code stay exactly the same.
+
+## Custom Providers
+
+You can register your own provider backends using `registerProvider()`:
+
+```typescript
+import { registerProvider, run } from "one-agent-sdk";
+
+registerProvider("my-llm", async (config) => {
+  return {
+    async *run(prompt) {
+      yield { type: "text", text: `Echo: ${prompt}` };
+      yield { type: "done", text: `Echo: ${prompt}` };
+    },
+    async *chat(message) {
+      yield { type: "text", text: `Echo: ${message}` };
+      yield { type: "done", text: `Echo: ${message}` };
+    },
+    async close() {},
+  };
+});
+
+// Use like any built-in provider
+const { stream } = await run("Hello", {
+  provider: "my-llm",
+  agent,
+});
+```
+
+Custom providers are checked before built-in ones, so you can even override a built-in provider name if needed. See the [registerProvider() API reference](/api/register-provider) for details.
