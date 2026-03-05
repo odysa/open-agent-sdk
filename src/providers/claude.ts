@@ -57,9 +57,13 @@ export async function createClaudeProvider(config: RunConfig): Promise<ProviderB
   let sessionId: string | undefined;
 
   async function* runQuery(prompt: string): AsyncGenerator<StreamChunk> {
+    const env = { ...process.env, CLAUDECODE: undefined };
+
     const options: Record<string, unknown> = {
       systemPrompt: config.agent.prompt,
       permissionMode: "bypassPermissions",
+      allowDangerouslySkipPermissions: true,
+      env,
     };
 
     if (config.agent.model) options.model = config.agent.model;
@@ -68,6 +72,11 @@ export async function createClaudeProvider(config: RunConfig): Promise<ProviderB
     if (agents) options.agents = agents;
     if (sessionId) options.resume = sessionId;
     if (config.maxTurns) options.maxTurns = config.maxTurns;
+    if (config.signal) {
+      const ac = new AbortController();
+      config.signal.addEventListener("abort", () => ac.abort());
+      options.abortController = ac;
+    }
     if (config.providerOptions) Object.assign(options, config.providerOptions);
 
     let fullText = "";
@@ -75,7 +84,6 @@ export async function createClaudeProvider(config: RunConfig): Promise<ProviderB
     for await (const msg of query({
       prompt,
       options: options as any,
-      signal: config.signal,
     })) {
       if (msg.type === "system" && msg.subtype === "init") {
         sessionId = msg.session_id;
