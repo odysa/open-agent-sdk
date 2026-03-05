@@ -3,6 +3,13 @@ import type { RunConfig, StreamChunk } from "../types.js";
 
 export type MockEvent = StreamChunk;
 
+/** Create an async generator from an array of chunks */
+export async function* fromChunks(chunks: StreamChunk[]): AsyncGenerator<StreamChunk> {
+  for (const chunk of chunks) {
+    yield chunk;
+  }
+}
+
 /** Collect all chunks from a stream */
 export async function collect(stream: AsyncGenerator<StreamChunk>): Promise<StreamChunk[]> {
   const chunks: StreamChunk[] = [];

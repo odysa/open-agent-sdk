@@ -1,25 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { applyMiddleware, defineMiddleware } from "../middleware.js";
 import type { MiddlewareContext, StreamChunk } from "../types.js";
+import { collect, fromChunks } from "./mock-provider.js";
 
 const mockContext: MiddlewareContext = {
   agent: { name: "test-agent", description: "Test", prompt: "You are a test agent." },
   provider: "claude",
 };
-
-async function* fromChunks(chunks: StreamChunk[]): AsyncGenerator<StreamChunk> {
-  for (const chunk of chunks) {
-    yield chunk;
-  }
-}
-
-async function collectChunks(gen: AsyncGenerator<StreamChunk>): Promise<StreamChunk[]> {
-  const result: StreamChunk[] = [];
-  for await (const chunk of gen) {
-    result.push(chunk);
-  }
-  return result;
-}
 
 describe("defineMiddleware", () => {
   test("returns the same function", () => {
@@ -33,7 +20,7 @@ describe("defineMiddleware", () => {
 describe("applyMiddleware", () => {
   test("passthrough with empty middleware array", async () => {
     const chunks: StreamChunk[] = [{ type: "text", text: "hello" }, { type: "done" }];
-    const result = await collectChunks(applyMiddleware(fromChunks(chunks), [], mockContext));
+    const result = await collect(applyMiddleware(fromChunks(chunks), [], mockContext));
     expect(result).toEqual(chunks);
   });
 
@@ -54,7 +41,7 @@ describe("applyMiddleware", () => {
       }
     });
 
-    const result = await collectChunks(applyMiddleware(fromChunks(chunks), [upperMw], mockContext));
+    const result = await collect(applyMiddleware(fromChunks(chunks), [upperMw], mockContext));
     expect(result).toEqual([
       { type: "text", text: "HELLO" },
       { type: "text", text: "WORLD" },
@@ -85,7 +72,7 @@ describe("applyMiddleware", () => {
       }
     });
 
-    const result = await collectChunks(
+    const result = await collect(
       applyMiddleware(fromChunks(chunks), [appendA, appendB], mockContext),
     );
     // appendA runs first, then appendB on its output
@@ -107,9 +94,7 @@ describe("applyMiddleware", () => {
       }
     });
 
-    const result = await collectChunks(
-      applyMiddleware(fromChunks(chunks), [dropToolCalls], mockContext),
-    );
+    const result = await collect(applyMiddleware(fromChunks(chunks), [dropToolCalls], mockContext));
     expect(result).toEqual([
       { type: "text", text: "keep" },
       { type: "text", text: "also keep" },
@@ -125,7 +110,7 @@ describe("applyMiddleware", () => {
       yield* stream;
     });
 
-    await collectChunks(applyMiddleware(fromChunks(chunks), [captureMw], mockContext));
+    await collect(applyMiddleware(fromChunks(chunks), [captureMw], mockContext));
     expect(capturedContexts).toHaveLength(1);
     expect(capturedContexts[0]).toEqual(mockContext);
   });
@@ -144,7 +129,7 @@ describe("applyMiddleware", () => {
       yield* stream;
     });
 
-    await collectChunks(applyMiddleware(fromChunks(chunks), [mw1, mw2], mockContext));
+    await collect(applyMiddleware(fromChunks(chunks), [mw1, mw2], mockContext));
     expect(capturedContexts).toHaveLength(2);
     expect(capturedContexts[0]).toEqual(mockContext);
     expect(capturedContexts[1]).toEqual(mockContext);
@@ -152,7 +137,7 @@ describe("applyMiddleware", () => {
 
   test("no middleware leaves stream unchanged", async () => {
     const chunks: StreamChunk[] = [{ type: "text", text: "unchanged" }, { type: "done" }];
-    const result = await collectChunks(applyMiddleware(fromChunks(chunks), [], mockContext));
+    const result = await collect(applyMiddleware(fromChunks(chunks), [], mockContext));
     expect(result).toEqual(chunks);
   });
 });
