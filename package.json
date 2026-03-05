@@ -1,6 +1,19 @@
 {
   "name": "one-agent-sdk",
   "version": "0.1.5",
+  "description": "Provider-agnostic SDK for building LLM agents — one API for Claude, Codex, and Kimi",
+  "keywords": [
+    "ai",
+    "agent",
+    "llm",
+    "claude",
+    "openai",
+    "codex",
+    "kimi",
+    "streaming",
+    "tools",
+    "typescript"
+  ],
   "type": "module",
   "repository": {
     "type": "git",
