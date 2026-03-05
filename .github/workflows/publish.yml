@@ -33,7 +33,7 @@ jobs:
       - run: bun run build
 
       - name: Set version
-        run: npm version ${{ inputs.version }} --no-git-tag-version
+        run: npm version ${{ inputs.version }} --no-git-tag-version --allow-same-version
 
       - name: Commit, tag, and push
         run: |
