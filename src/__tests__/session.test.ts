@@ -18,8 +18,7 @@ function makeMockRunner(events: StreamChunk[]): {
   runner: (prompt: string, config: RunConfig) => Promise<AgentRun>;
   calls: { prompt: string }[];
 } {
-  const { provider, setEvents, calls } = createMockProvider(events);
-  setEvents(events);
+  const { provider, calls } = createMockProvider(events);
 
   return {
     runner: async (prompt: string, config: RunConfig): Promise<AgentRun> => {
