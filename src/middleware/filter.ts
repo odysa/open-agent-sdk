@@ -11,19 +11,18 @@ export interface FilterOptions {
 }
 
 export function filter(options: FilterOptions): Middleware {
-  const check: (chunk: StreamChunk) => boolean = options.predicate
-    ? options.predicate
-    : options.include
-      ? ((s) => {
-          const set = new Set<string>(s);
-          return (c: StreamChunk) => set.has(c.type);
-        })(options.include)
-      : options.exclude
-        ? ((s) => {
-            const set = new Set<string>(s);
-            return (c: StreamChunk) => !set.has(c.type);
-          })(options.exclude)
-        : () => true;
+  let check: (chunk: StreamChunk) => boolean;
+  if (options.predicate) {
+    check = options.predicate;
+  } else if (options.include) {
+    const set = new Set<string>(options.include);
+    check = (c) => set.has(c.type);
+  } else if (options.exclude) {
+    const set = new Set<string>(options.exclude);
+    check = (c) => !set.has(c.type);
+  } else {
+    check = () => true;
+  }
 
   return defineMiddleware(async function* (stream) {
     for await (const chunk of stream) {

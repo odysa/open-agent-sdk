@@ -20,6 +20,8 @@ export function textCollector(options: TextCollectorOptions = {}): TextCollector
   let collected = "";
 
   const middleware = defineMiddleware(async function* (stream) {
+    collected = "";
+
     for await (const chunk of stream) {
       if (chunk.type === "text") {
         collected += chunk.text;

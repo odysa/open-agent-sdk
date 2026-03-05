@@ -19,8 +19,6 @@ export function guardrails(options: GuardrailsOptions): Middleware {
     ? blockedKeywords.map((k) => k.toLowerCase())
     : blockedKeywords;
 
-  const blockedChunk: StreamChunk = { type: "error", error: "Content blocked by guardrails" };
-
   return defineMiddleware(async function* (stream) {
     for await (const chunk of stream) {
       if (chunk.type !== "text") {
@@ -32,14 +30,18 @@ export function guardrails(options: GuardrailsOptions): Middleware {
       const blocked = normalizedKeywords.some((kw) => textToCheck.includes(kw));
 
       if (blocked) {
-        if (onBlock === "error") yield blockedChunk;
+        if (onBlock === "error") {
+          yield { type: "error", error: "Content blocked by guardrails" } satisfies StreamChunk;
+        }
         continue;
       }
 
       if (validate) {
         const result = validate(chunk.text);
         if (result === false) {
-          if (onBlock === "error") yield blockedChunk;
+          if (onBlock === "error") {
+            yield { type: "error", error: "Content blocked by guardrails" } satisfies StreamChunk;
+          }
           continue;
         }
         if (typeof result === "string") {
