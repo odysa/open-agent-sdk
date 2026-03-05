@@ -1,15 +1,17 @@
 <div align="center">
 
-# One Agent SDK
+<picture>
+  <img src="./assets/banner.svg" alt="One Agent SDK" width="100%" />
+</picture>
 
-**One SDK for every agent.**
-
-Build LLM agents once. Run them on any backend.
+<br />
 
 [![npm version](https://img.shields.io/npm/v/one-agent-sdk?style=flat-square&color=cb3837&label=npm)](https://www.npmjs.com/package/one-agent-sdk)
 [![CI](https://img.shields.io/github/actions/workflow/status/odysa/one-agent-sdk/ci.yml?style=flat-square&label=CI)](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
+
+**One SDK, every agent.** Embed Claude Code, Codex, and Kimi into your TypeScript app — no API keys required.
 
 <br />
 
