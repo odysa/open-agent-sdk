@@ -4,7 +4,7 @@ export default defineConfig({
   title: "One Agent SDK",
   description:
     "Provider-agnostic TypeScript SDK for building LLM agents with tools and multi-agent handoffs",
-  base: "/one-agent-sdk/", // Change to '/' if using a custom domain
+  base: "/open-agent-sdk/", // Change to '/' if using a custom domain
 
   themeConfig: {
     nav: [
