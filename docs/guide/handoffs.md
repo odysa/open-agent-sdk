@@ -25,7 +25,16 @@ const calculatorTool = defineTool({
   name: "calculate",
   description: "Evaluate a math expression",
   parameters: z.object({ expression: z.string() }),
-  handler: async ({ expression }) => String(eval(expression)),
+  handler: async ({ expression }) => {
+    const match = expression.match(/^([\d.]+)\s*([+\-*/])\s*([\d.]+)$/);
+    if (!match) return "Error: only simple expressions like '2 + 3' are supported";
+    const [, a, op, b] = match;
+    const ops: Record<string, (a: number, b: number) => number> = {
+      "+": (a, b) => a + b, "-": (a, b) => a - b,
+      "*": (a, b) => a * b, "/": (a, b) => a / b,
+    };
+    return String(ops[op](Number(a), Number(b)));
+  },
 });
 
 const researcher = defineAgent({

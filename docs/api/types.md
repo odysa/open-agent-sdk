@@ -155,6 +155,18 @@ interface SessionStore {
 }
 ```
 
+## SessionConfig
+
+Configuration options for `createSession()`.
+
+```typescript
+interface SessionConfig {
+  sessionId?: string;
+  store?: SessionStore;
+  runner?: (prompt: string, config: RunConfig) => Promise<AgentRun>;
+}
+```
+
 ## ProviderBackend
 
 Interface that provider implementations must satisfy.
@@ -173,4 +185,12 @@ Factory function for custom providers.
 
 ```typescript
 type ProviderFactory = (config: RunConfig) => Promise<ProviderBackend>;
+```
+
+## zodToJsonSchema
+
+Converts a Zod schema to JSON Schema. Used internally by providers that need JSON Schema (Codex, Kimi), but also exported for custom provider authors.
+
+```typescript
+function zodToJsonSchema(schema: z.ZodType): Record<string, unknown>;
 ```
