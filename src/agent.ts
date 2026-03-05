@@ -1,4 +1,4 @@
-import type { AgentDef, ToolDef, McpServerConfig } from "./types.js";
+import type { AgentDef, McpServerConfig, ToolDef } from "./types.js";
 
 /** Convenience helper to define an agent with type checking */
 export function defineAgent(config: {

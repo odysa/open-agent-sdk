@@ -1,22 +1,22 @@
 // Core types
-export type {
-  ToolDef,
-  AgentDef,
-  McpServerConfig,
-  StreamChunk,
-  RunConfig,
-  AgentRun,
-} from "./types.js";
-
-// Provider interface
-export type { Provider } from "./providers/types.js";
 
 // Helpers
 export { defineAgent } from "./agent.js";
-export { defineTool } from "./tool.js";
 
+// Provider backend interface
+export type { ProviderBackend } from "./providers/types.js";
 // Runner
 export { run, runToCompletion } from "./runner.js";
+export { defineTool } from "./tool.js";
+export type {
+  AgentDef,
+  AgentRun,
+  McpServerConfig,
+  Provider,
+  RunConfig,
+  StreamChunk,
+  ToolDef,
+} from "./types.js";
 
 // Utilities
 export { zodToJsonSchema } from "./utils/zod-to-jsonschema.js";

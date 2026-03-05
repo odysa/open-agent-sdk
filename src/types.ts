@@ -45,9 +45,12 @@ export type StreamChunk =
       usage?: { inputTokens: number; outputTokens: number };
     };
 
+/** Supported provider backends */
+export type Provider = "claude" | "openai" | "kimi";
+
 /** Configuration for a run */
 export interface RunConfig {
-  provider: "claude" | "openai" | "kimi";
+  provider: Provider;
   agent: AgentDef;
   /** Additional agents for handoffs */
   agents?: Record<string, AgentDef>;

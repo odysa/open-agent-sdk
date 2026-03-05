@@ -1,18 +1,15 @@
-import type { Provider } from "./types.js";
-import type { StreamChunk, RunConfig, ToolDef, AgentDef } from "../types.js";
+import type { AgentDef, RunConfig, StreamChunk, ToolDef } from "../types.js";
+import { handoffToolName, parseHandoff } from "../utils/handoff.js";
 import { zodToJsonSchema } from "../utils/zod-to-jsonschema.js";
+import type { ProviderBackend } from "./types.js";
 
-export async function createOpenAIProvider(
-  config: RunConfig
-): Promise<Provider> {
+export async function createOpenAIProvider(config: RunConfig): Promise<ProviderBackend> {
   let OpenAI: any;
   try {
     const mod = await import("openai");
     OpenAI = mod.default;
   } catch {
-    throw new Error(
-      'OpenAI provider requires the openai package. Install it with: bun add openai'
-    );
+    throw new Error("OpenAI provider requires the openai package. Install it with: bun add openai");
   }
 
   const apiKey = (config.providerOptions?.apiKey as string) ?? undefined;
@@ -42,7 +39,7 @@ export async function createOpenAIProvider(
       tools.push({
         type: "function",
         function: {
-          name: `transfer_to_${targetName}`,
+          name: handoffToolName(targetName),
           description: targetAgent?.description ?? `Transfer to ${targetName}`,
           parameters: { type: "object", properties: {} },
         },
@@ -82,10 +79,7 @@ export async function createOpenAIProvider(
 
       // Accumulate the streamed response
       let assistantContent = "";
-      const toolCalls: Map<
-        number,
-        { id: string; name: string; arguments: string }
-      > = new Map();
+      const toolCalls: Map<number, { id: string; name: string; arguments: string }> = new Map();
 
       for await (const chunk of stream) {
         const delta = chunk.choices[0]?.delta;
@@ -106,8 +100,7 @@ export async function createOpenAIProvider(
             };
             if (tc.id) existing.id = tc.id;
             if (tc.function?.name) existing.name = tc.function.name;
-            if (tc.function?.arguments)
-              existing.arguments += tc.function.arguments;
+            if (tc.function?.arguments) existing.arguments += tc.function.arguments;
             toolCalls.set(tc.index, existing);
           }
         }
@@ -148,8 +141,9 @@ export async function createOpenAIProvider(
         };
 
         // Check if this is a handoff
-        if (tc.name.startsWith("transfer_to_")) {
-          const targetName = tc.name.slice("transfer_to_".length);
+        const handoffTarget = parseHandoff(tc.name);
+        if (handoffTarget) {
+          const targetName = handoffTarget;
           const targetAgent = config.agents?.[targetName];
 
           if (targetAgent) {
