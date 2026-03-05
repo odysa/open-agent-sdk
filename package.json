@@ -23,7 +23,10 @@
     "format": "biome format --write src/",
     "start": "bun run examples/hello.ts",
     "test": "bun test",
-    "ci": "bun run check && bun run lint && bun test"
+    "ci": "bun run check && bun run lint && bun test",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "zod": "^4.0.0"
@@ -47,6 +50,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
     "@types/node": "^22.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitepress": "^1.6.4"
   }
 }
