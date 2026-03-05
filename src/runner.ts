@@ -1,8 +1,14 @@
 import { applyMiddleware } from "./middleware.js";
 import type { ProviderBackend } from "./providers/types.js";
+import { getProvider } from "./registry.js";
 import type { AgentRun, RunConfig } from "./types.js";
 
 async function createProvider(config: RunConfig): Promise<ProviderBackend> {
+  // Check registry first (custom providers)
+  const factory = getProvider(config.provider);
+  if (factory) return factory(config);
+
+  // Built-in providers
   switch (config.provider) {
     case "claude": {
       const { createClaudeProvider } = await import("./providers/claude.js");
@@ -17,7 +23,9 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       return createKimiProvider(config);
     }
     default:
-      throw new Error(`Unknown provider: ${config.provider}. Use: claude, codex, kimi`);
+      throw new Error(
+        `Unknown provider: ${config.provider}. Use: claude, codex, kimi, or register a custom provider with registerProvider()`,
+      );
   }
 }
 

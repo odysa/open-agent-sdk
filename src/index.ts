@@ -6,12 +6,16 @@ export { applyMiddleware, defineMiddleware } from "./middleware.js";
 
 // Provider backend interface
 export type { ProviderBackend } from "./providers/types.js";
+export type { ProviderFactory } from "./registry.js";
+// Registry
+export { clearProviders, registerProvider } from "./registry.js";
 // Runner
 export { run, runToCompletion } from "./runner.js";
 export { defineTool } from "./tool.js";
 export type {
   AgentDef,
   AgentRun,
+  BuiltinProvider,
   McpServerConfig,
   Middleware,
   MiddlewareContext,

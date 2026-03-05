@@ -45,8 +45,11 @@ export type StreamChunk =
       usage?: { inputTokens: number; outputTokens: number };
     };
 
-/** Supported provider backends */
-export type Provider = "claude" | "codex" | "kimi";
+/** Built-in provider backends */
+export type BuiltinProvider = "claude" | "codex" | "kimi";
+
+/** Supported provider backends (built-in + registered) */
+export type Provider = BuiltinProvider | (string & {});
 
 /** Context passed to each middleware function */
 export interface MiddlewareContext {
