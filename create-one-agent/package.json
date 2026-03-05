@@ -1,0 +1,27 @@
+{
+  "name": "create-one-agent",
+  "version": "0.1.0",
+  "description": "Scaffold a One Agent SDK project in seconds",
+  "type": "module",
+  "bin": {
+    "create-one-agent": "./index.mjs"
+  },
+  "files": [
+    "index.mjs"
+  ],
+  "keywords": [
+    "agent",
+    "llm",
+    "claude",
+    "codex",
+    "kimi",
+    "scaffold",
+    "create"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/odysa/one-agent-sdk",
+    "directory": "create-one-agent"
+  }
+}
