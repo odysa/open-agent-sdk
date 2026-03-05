@@ -19,9 +19,9 @@ Each LLM provider has its own SDK with different APIs, streaming formats, and to
 
 | Provider | SDK | Agent Backend |
 | -------- | --- | ------------- |
-| `claude` | `@anthropic-ai/claude-agent-sdk` | Claude Code |
+| `claude-code` | `@anthropic-ai/claude-agent-sdk` | Claude Code |
 | `codex` | `@openai/codex-sdk` | ChatGPT Codex |
-| `kimi` | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
+| `kimi-cli` | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
 
 All providers are optional peer dependencies — install only the ones you need. You can also [register custom providers](/guide/providers#custom-providers).
 

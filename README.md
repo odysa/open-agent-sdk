@@ -194,11 +194,11 @@ import { createSession } from "one-agent-sdk";
 
 const session = createSession();
 
-const first = await session.run("My name is Alice.", { provider: "claude", agent });
+const first = await session.run("My name is Alice.", { provider: "claude-code", agent });
 for await (const chunk of first.stream) { /* ... */ }
 
 // The agent remembers the previous turn
-const second = await session.run("What's my name?", { provider: "claude", agent });
+const second = await session.run("What's my name?", { provider: "claude-code", agent });
 for await (const chunk of second.stream) { /* ... */ }
 ```
 
