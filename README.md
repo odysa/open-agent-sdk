@@ -23,6 +23,17 @@ Every LLM provider ships its own SDK with different streaming formats, tool-call
 - **Orchestrate agents** — multi-agent handoffs that work on any provider
 - **Skip the API keys** — providers run coding agent CLIs as in-process subprocesses
 
+| Feature | Description |
+| --- | --- |
+| Unified streaming | Single `AsyncGenerator<StreamChunk>` interface across all providers |
+| Type-safe tools | Define tool parameters with Zod schemas, get full type inference |
+| Multi-agent handoffs | Agents hand off to each other seamlessly on any backend |
+| Structured output | Validate agent responses against Zod schemas |
+| Sessions | Multi-turn conversation history with pluggable storage |
+| Middleware | Composable stream transformations between provider and app |
+| Custom providers | Register your own backends alongside built-in ones |
+| No API keys | Agents run as local subprocesses using existing CLI auth |
+
 ## Supported providers
 
 | Provider | SDK | Agent Backend |
