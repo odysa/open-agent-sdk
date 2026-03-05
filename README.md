@@ -1,44 +1,40 @@
-# one-agent-sdk
+# One Agent SDK
 
-A provider-agnostic TypeScript SDK for building LLM agents with tools and multi-agent handoffs. Write your agent once, run it on any backend — Claude Code, ChatGPT Codex, Kimi-CLI, and more.
+**Write once. Run anywhere.** A TypeScript SDK that lets you build LLM agents with tools and multi-agent handoffs — then swap providers with a single line change.
 
-## Supported Providers
-
-| Provider | SDK | Coding Agent |
-| -------- | --- | ------------ |
-| **claude** | `@anthropic-ai/claude-agent-sdk` | Claude Code |
-| **codex** | `@openai/codex-sdk` | ChatGPT Codex |
-| **kimi** | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
-
-All providers are optional peer dependencies — install only the ones you need. Each provider spawns the corresponding coding agent CLI as a subprocess, so no API keys are needed.
-
-## Installation
-
-```bash
-# npm
-npm install one-agent-sdk
-
-# pnpm
-pnpm add one-agent-sdk
-
-# yarn
-yarn add one-agent-sdk
-
-# bun
-bun add one-agent-sdk
+```typescript
+const { stream } = await run("What's the weather?", {
+  provider: "claude", // swap to "codex" or "kimi" — everything else stays the same
+  agent,
+});
 ```
 
-Then install the provider SDK for your backend:
+## Why?
+
+Every LLM provider has its own SDK, streaming format, and tool-calling API. You shouldn't have to rewrite your agent for each one.
+
+One Agent SDK gives you:
+
+- **One interface** — `AsyncGenerator<StreamChunk>` across all providers
+- **One tool format** — define tools once with Zod, use everywhere
+- **One handoff pattern** — multi-agent orchestration that works on any backend
+- **Zero API keys** — providers spawn coding agent CLIs as subprocesses
+
+## Providers
+
+| Provider | SDK | Agent |
+| -------- | --- | ----- |
+| `claude` | `@anthropic-ai/claude-agent-sdk` | Claude Code |
+| `codex` | `@openai/codex-sdk` | ChatGPT Codex |
+| `kimi` | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
+
+All optional peer dependencies — install only what you need.
+
+## Install
 
 ```bash
-# For Claude Code
-npm install @anthropic-ai/claude-agent-sdk
-
-# For ChatGPT Codex
-npm install @openai/codex-sdk
-
-# For Kimi-CLI
-npm install @moonshot-ai/kimi-agent-sdk
+npm install one-agent-sdk
+npm install @anthropic-ai/claude-agent-sdk  # pick your provider
 ```
 
 ## Quick Start
@@ -47,7 +43,6 @@ npm install @moonshot-ai/kimi-agent-sdk
 import { z } from "zod";
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
-// Define a tool
 const weatherTool = defineTool({
   name: "get_weather",
   description: "Get the current weather for a city",
@@ -59,109 +54,77 @@ const weatherTool = defineTool({
   },
 });
 
-// Define an agent
 const agent = defineAgent({
   name: "assistant",
   description: "A helpful assistant",
-  prompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
+  prompt: "You are a helpful assistant.",
   tools: [weatherTool],
 });
 
-// Run — swap provider by changing this value
 const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "claude", // "claude" | "codex" | "kimi"
+  provider: "claude",
   agent,
 });
 
 for await (const chunk of stream) {
-  if (chunk.type === "text") {
-    process.stdout.write(chunk.text);
-  }
+  if (chunk.type === "text") process.stdout.write(chunk.text);
 }
 ```
 
 ## Multi-Agent Handoffs
 
-Agents can hand off to each other by declaring `handoffs` and providing an `agents` map:
+Agents hand off to each other seamlessly. Define who can talk to whom, and the SDK handles the rest.
 
 ```typescript
 const researcher = defineAgent({
   name: "researcher",
-  description: "Research agent that can search the web",
-  prompt: "You are a research assistant. If the user needs math help, hand off to the math agent.",
+  description: "Searches the web",
+  prompt: "You are a research assistant. Hand off to math for calculations.",
   tools: [searchTool],
   handoffs: ["math"],
 });
 
-const mathAgent = defineAgent({
+const math = defineAgent({
   name: "math",
-  description: "Math agent that can evaluate expressions",
-  prompt: "You are a math assistant. If the user needs research help, hand off to the researcher.",
+  description: "Evaluates expressions",
+  prompt: "You are a math assistant. Hand off to researcher for web searches.",
   tools: [calculatorTool],
   handoffs: ["researcher"],
 });
 
-const { stream } = await run("What is the population of Tokyo? Then calculate 15% of that.", {
+const { stream } = await run("Population of Tokyo? Then calculate 15% of it.", {
   provider: "claude",
   agent: researcher,
-  agents: { researcher, math: mathAgent },
+  agents: { researcher, math },
 });
 
 for await (const chunk of stream) {
-  switch (chunk.type) {
-    case "text":
-      process.stdout.write(chunk.text);
-      break;
-    case "handoff":
-      console.log(`[handoff] ${chunk.fromAgent} -> ${chunk.toAgent}`);
-      break;
-  }
+  if (chunk.type === "text") process.stdout.write(chunk.text);
+  if (chunk.type === "handoff") console.log(`\n${chunk.fromAgent} -> ${chunk.toAgent}`);
 }
 ```
 
-## API Reference
+## Stream Events
 
-### `run(prompt, config): Promise<AgentRun>`
+| Type | Fields | |
+| --- | --- | --- |
+| `text` | `text` | Generated text |
+| `tool_call` | `toolName`, `toolArgs`, `toolCallId` | Agent calling a tool |
+| `tool_result` | `toolCallId`, `result` | Tool returned a result |
+| `handoff` | `fromAgent`, `toAgent` | Agent handoff |
+| `error` | `error` | Something went wrong |
+| `done` | `text?`, `usage?` | Run completed |
 
-Starts a streaming agent run.
+## API
 
-- **`prompt`** — the user message
-- **`config.provider`** — `"claude"` | `"codex"` | `"kimi"`
-- **`config.agent`** — the agent definition
-- **`config.agents`** — map of agent names to definitions (for handoffs)
-- **`config.maxTurns`** — limit tool-use turns
-- **`config.signal`** — `AbortSignal` for cancellation
+| Function | Description |
+| --- | --- |
+| `run(prompt, config)` | Start a streaming run. Returns `{ stream, chat, close }` |
+| `runToCompletion(prompt, config)` | Run and return the final text |
+| `defineAgent({...})` | Define an agent |
+| `defineTool({...})` | Define a tool with Zod schema |
 
-Returns `{ stream, chat, close }`:
-
-- **`stream`** — `AsyncGenerator<StreamChunk>` of events
-- **`chat(message)`** — send a follow-up message, returns a new stream
-- **`close()`** — clean up resources
-
-### `runToCompletion(prompt, config): Promise<string>`
-
-Convenience wrapper that collects all text chunks and returns the final string.
-
-### `defineTool({ name, description, parameters, handler })`
-
-Helper to define a tool with a Zod schema for type-safe parameters.
-
-### `defineAgent({ name, description, prompt, tools?, handoffs?, model?, mcpServers? })`
-
-Helper to define an agent.
-
-### Stream Chunks
-
-The stream yields a discriminated union (`StreamChunk`):
-
-| Type          | Fields                                    |
-| ------------- | ----------------------------------------- |
-| `text`        | `text`                                    |
-| `tool_call`   | `toolName`, `toolArgs`, `toolCallId`      |
-| `tool_result` | `toolCallId`, `result`                    |
-| `handoff`     | `fromAgent`, `toAgent`                    |
-| `error`       | `error`                                   |
-| `done`        | `text?`, `usage?`                         |
+[Full API docs](https://odysa.github.io/one-agent-sdk/)
 
 ## License
 
