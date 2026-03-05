@@ -7,10 +7,6 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       const { createClaudeProvider } = await import("./providers/claude.js");
       return createClaudeProvider(config);
     }
-    case "openai": {
-      const { createOpenAIProvider } = await import("./providers/openai.js");
-      return createOpenAIProvider(config);
-    }
     case "codex": {
       const { createCodexProvider } = await import("./providers/codex.js");
       return createCodexProvider(config);
@@ -20,7 +16,7 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       return createKimiProvider(config);
     }
     default:
-      throw new Error(`Unknown provider: ${config.provider}. Use: claude, openai, codex, kimi`);
+      throw new Error(`Unknown provider: ${config.provider}. Use: claude, codex, kimi`);
   }
 }
 

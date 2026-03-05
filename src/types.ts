@@ -46,7 +46,7 @@ export type StreamChunk =
     };
 
 /** Supported provider backends */
-export type Provider = "claude" | "openai" | "codex" | "kimi";
+export type Provider = "claude" | "codex" | "kimi";
 
 /** Configuration for a run */
 export interface RunConfig {

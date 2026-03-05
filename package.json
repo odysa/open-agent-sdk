@@ -29,17 +29,13 @@
   "peerDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.68",
     "@moonshot-ai/kimi-agent-sdk": "*",
-    "@openai/codex-sdk": "*",
-    "openai": "^4.0.0"
+    "@openai/codex-sdk": "*"
   },
   "peerDependenciesMeta": {
     "@anthropic-ai/claude-agent-sdk": {
       "optional": true
     },
     "@openai/codex-sdk": {
-      "optional": true
-    },
-    "openai": {
       "optional": true
     },
     "@moonshot-ai/kimi-agent-sdk": {

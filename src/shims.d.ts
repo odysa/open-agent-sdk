@@ -12,18 +12,6 @@ declare module "@anthropic-ai/claude-agent-sdk" {
   ): any;
 }
 
-declare module "openai" {
-  class OpenAI {
-    constructor(options?: { apiKey?: string });
-    chat: {
-      completions: {
-        create(options: any): Promise<AsyncIterable<any>>;
-      };
-    };
-  }
-  export default OpenAI;
-}
-
 declare module "@openai/codex-sdk" {
   class Codex {
     constructor(options?: Record<string, unknown>);
