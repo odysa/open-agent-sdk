@@ -2,6 +2,7 @@
 
 // Helpers
 export { defineAgent } from "./agent.js";
+export { applyMiddleware, defineMiddleware } from "./middleware.js";
 
 // Provider backend interface
 export type { ProviderBackend } from "./providers/types.js";
@@ -12,6 +13,8 @@ export type {
   AgentDef,
   AgentRun,
   McpServerConfig,
+  Middleware,
+  MiddlewareContext,
   Provider,
   RunConfig,
   StreamChunk,

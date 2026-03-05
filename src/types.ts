@@ -48,6 +48,18 @@ export type StreamChunk =
 /** Supported provider backends */
 export type Provider = "claude" | "codex" | "kimi";
 
+/** Context passed to each middleware function */
+export interface MiddlewareContext {
+  agent: AgentDef;
+  provider: string;
+}
+
+/** Middleware transforms the stream between provider and consumer */
+export type Middleware = (
+  stream: AsyncGenerator<StreamChunk>,
+  context: MiddlewareContext,
+) => AsyncGenerator<StreamChunk>;
+
 /** Configuration for a run */
 export interface RunConfig {
   provider: Provider;
@@ -59,6 +71,7 @@ export interface RunConfig {
   workDir?: string;
   maxTurns?: number;
   signal?: AbortSignal;
+  middleware?: Middleware[];
 }
 
 /** Handle returned by run() */
