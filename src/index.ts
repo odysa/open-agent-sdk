@@ -7,6 +7,9 @@ export { defineAgent } from "./agent.js";
 export type { ProviderBackend } from "./providers/types.js";
 // Runner
 export { run, runToCompletion } from "./runner.js";
+// Session management
+export type { Message, Session, SessionConfig, SessionStore } from "./session.js";
+export { createSession, MemoryStore } from "./session.js";
 export { defineTool } from "./tool.js";
 export type {
   AgentDef,
