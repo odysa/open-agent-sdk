@@ -103,19 +103,15 @@ describe("usageTracker", () => {
 describe("timing", () => {
   test("calls onFirstText with elapsed time", async () => {
     let ttft = -1;
-    const mw = timing({ onFirstText: (t) => (ttft = t) });
-    await apply([{ type: "text", text: "hi" }, { type: "done" }], mw);
+    const t = timing({ onFirstText: (ms) => (ttft = ms) });
+    await apply([{ type: "text", text: "hi" }, { type: "done" }], t.middleware);
     expect(ttft).toBeGreaterThanOrEqual(0);
   });
 
   test("calls onComplete with timing info", async () => {
-    let info: {
-      timeToFirstChunk: number;
-      timeToFirstText: number | null;
-      duration: number;
-    } | null = null;
-    const mw = timing({ onComplete: (i) => (info = i) });
-    await apply([{ type: "text", text: "hi" }, { type: "done" }], mw);
+    const t = timing();
+    await apply([{ type: "text", text: "hi" }, { type: "done" }], t.middleware);
+    const info = t.getInfo();
     expect(info).not.toBeNull();
     expect(info?.duration).toBeGreaterThanOrEqual(0);
     expect(info?.timeToFirstText).toBeGreaterThanOrEqual(0);
@@ -123,17 +119,21 @@ describe("timing", () => {
   });
 
   test("timeToFirstText is null when no text chunks", async () => {
-    let info: { timeToFirstText: number | null } | null = null;
-    const mw = timing({ onComplete: (i) => (info = i) });
-    await apply([{ type: "done" }], mw);
-    expect(info?.timeToFirstText).toBeNull();
+    const t = timing();
+    await apply([{ type: "done" }], t.middleware);
+    expect(t.getInfo()?.timeToFirstText).toBeNull();
   });
 
   test("passes all chunks through", async () => {
-    const mw = timing();
+    const t = timing();
     const chunks: StreamChunk[] = [{ type: "text", text: "hi" }, { type: "done" }];
-    const result = await apply(chunks, mw);
+    const result = await apply(chunks, t.middleware);
     expect(result).toEqual(chunks);
+  });
+
+  test("getInfo returns null before stream completes", () => {
+    const t = timing();
+    expect(t.getInfo()).toBeNull();
   });
 });
 

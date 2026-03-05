@@ -13,10 +13,11 @@ export interface LoggingOptions {
 export function logging(options: LoggingOptions = {}): Middleware {
   const { logger, types, label = "[middleware:logging]" } = options;
   const log = logger ?? ((message: string, _chunk: StreamChunk) => console.log(message));
+  const typeSet = types ? new Set<string>(types) : null;
 
   return defineMiddleware(async function* (stream) {
     for await (const chunk of stream) {
-      if (!types || types.includes(chunk.type)) {
+      if (!typeSet || typeSet.has(chunk.type)) {
         log(`${label} ${chunk.type}: ${JSON.stringify(chunk)}`, chunk);
       }
       yield chunk;

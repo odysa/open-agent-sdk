@@ -11,7 +11,7 @@ export type { LoggingOptions } from "./logging.js";
 export { logging } from "./logging.js";
 export type { TextCollectorHandle, TextCollectorOptions } from "./text-collector.js";
 export { textCollector } from "./text-collector.js";
-export type { TimingInfo, TimingOptions } from "./timing.js";
+export type { TimingHandle, TimingInfo, TimingOptions } from "./timing.js";
 export { timing } from "./timing.js";
 export type { UsageStats, UsageTrackerHandle, UsageTrackerOptions } from "./usage-tracker.js";
 export { usageTracker } from "./usage-tracker.js";

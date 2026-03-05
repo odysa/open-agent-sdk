@@ -77,7 +77,12 @@ interface UsageStats {
 Measure stream timing.
 
 ```typescript
-function timing(options?: TimingOptions): Middleware
+function timing(options?: TimingOptions): TimingHandle
+
+interface TimingHandle {
+  middleware: Middleware;
+  getInfo(): TimingInfo | null;
+}
 
 interface TimingInfo {
   timeToFirstChunk: number;

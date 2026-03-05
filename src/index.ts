@@ -9,6 +9,7 @@ export type {
   LoggingOptions,
   TextCollectorHandle,
   TextCollectorOptions,
+  TimingHandle,
   TimingInfo,
   TimingOptions,
   UsageStats,

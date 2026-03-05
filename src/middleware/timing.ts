@@ -17,8 +17,15 @@ export interface TimingOptions {
   onComplete?: (info: TimingInfo) => void;
 }
 
-export function timing(options: TimingOptions = {}): Middleware {
-  return defineMiddleware(async function* (stream) {
+export interface TimingHandle {
+  middleware: Middleware;
+  getInfo(): TimingInfo | null;
+}
+
+export function timing(options: TimingOptions = {}): TimingHandle {
+  let info: TimingInfo | null = null;
+
+  const middleware = defineMiddleware(async function* (stream) {
     const start = performance.now();
     let timeToFirstChunk: number | null = null;
     let timeToFirstText: number | null = null;
@@ -41,6 +48,12 @@ export function timing(options: TimingOptions = {}): Middleware {
     }
 
     const duration = performance.now() - start;
-    options.onComplete?.({ timeToFirstChunk: timeToFirstChunk ?? 0, timeToFirstText, duration });
+    info = { timeToFirstChunk: timeToFirstChunk ?? 0, timeToFirstText, duration };
+    options.onComplete?.(info);
   });
+
+  return {
+    middleware,
+    getInfo: () => (info ? { ...info } : null),
+  };
 }

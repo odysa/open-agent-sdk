@@ -84,17 +84,21 @@ tracker.reset();    // Clear accumulated stats
 
 ### `timing(options?)`
 
-Measure time-to-first-text (TTFT), time-to-first-chunk, and total stream duration.
+Measure time-to-first-text (TTFT), time-to-first-chunk, and total stream duration. Returns a stateful handle.
 
 ```typescript
 import { timing } from "one-agent-sdk";
 
-timing({
+const t = timing({
   onFirstText: (ms) => console.log(`TTFT: ${ms}ms`),
   onComplete: ({ timeToFirstChunk, timeToFirstText, duration }) => {
     console.log(`Total: ${duration}ms`);
   },
 });
+
+// Use t.middleware in your middleware array
+// After the stream completes:
+t.getInfo(); // { timeToFirstChunk, timeToFirstText, duration }
 ```
 
 **Options:**
@@ -103,6 +107,8 @@ timing({
 | --- | --- | --- |
 | `onFirstText` | `(elapsed: number) => void` | Callback when first text chunk arrives |
 | `onComplete` | `(info: TimingInfo) => void` | Callback when stream completes |
+
+**Returns:** `{ middleware, getInfo() }`
 
 ### `textCollector(options?)`
 
