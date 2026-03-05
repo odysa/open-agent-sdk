@@ -1,69 +1,83 @@
-# One Agent SDK
+<div align="center">
 
-[![npm version](https://img.shields.io/npm/v/one-agent-sdk)](https://www.npmjs.com/package/one-agent-sdk)
-[![CI](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+<picture>
+  <img src="./assets/banner.svg" alt="One Agent SDK" width="100%" />
+</picture>
 
-**One SDK for every agent.** Embed in-process agents — like Claude Code, ChatGPT Codex, and Kimi-CLI — directly into your TypeScript applications. No API keys needed: agents run as local subprocesses using your existing CLI authentication. Build agents once and run them on any backend — one API, one line to swap.
+<br />
+
+[![npm version](https://img.shields.io/npm/v/one-agent-sdk?style=flat-square&color=cb3837&label=npm)](https://www.npmjs.com/package/one-agent-sdk)
+[![CI](https://img.shields.io/github/actions/workflow/status/odysa/one-agent-sdk/ci.yml?style=flat-square&label=CI)](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
+
+**One SDK, every agent.** Embed Claude Code, Codex, and Kimi into your TypeScript app — no API keys required.
+
+<br />
+
+[Getting Started](#getting-started) · [Features](#features) · [Providers](#supported-providers) · [API Reference](#api-reference) · [Examples](#examples)
+
+<br />
+
+</div>
 
 ```typescript
+import { defineAgent, defineTool, run } from "one-agent-sdk";
+
 const { stream } = await run("What's the weather?", {
-  provider: "claude", // swap to "codex" or "kimi" — same code, different backend
+  provider: "claude",  // swap to "codex" or "kimi" — same code, different backend
   agent,
 });
 ```
 
-## Why?
+<br />
 
-Every LLM provider ships its own SDK with different streaming formats, tool-calling APIs, and agent patterns. One Agent SDK abstracts these differences so you can:
+## The Problem
 
-- **Write once, run anywhere** — swap providers by changing a single string
-- **Define tools once** — Zod schemas that work across all backends
-- **Orchestrate agents** — multi-agent handoffs that work on any provider
-- **Skip the API keys** — providers run coding agent CLIs as in-process subprocesses
+Every LLM provider ships its own SDK with different streaming formats, tool-calling APIs, and agent patterns. You end up rewriting the same logic for each backend.
 
-| Feature | Description |
-| --- | --- |
-| Unified streaming | Single `AsyncGenerator<StreamChunk>` interface across all providers |
-| Type-safe tools | Define tool parameters with Zod schemas, get full type inference |
-| Multi-agent handoffs | Agents hand off to each other seamlessly on any backend |
-| Structured output | Validate agent responses against Zod schemas |
-| Sessions | Multi-turn conversation history with pluggable storage |
-| Middleware | Composable stream transformations between provider and app |
-| Custom providers | Register your own backends alongside built-in ones |
-| No API keys | Agents run as local subprocesses using existing CLI auth |
+## The Solution
 
-## Supported providers
+One Agent SDK gives you a single, provider-agnostic interface. Write your agents, tools, and orchestration once — then swap backends by changing one string:
 
-| Provider | SDK | Agent Backend |
-| -------- | --- | ------------- |
+```diff
+  const { stream } = await run("Analyze this code", {
+-   provider: "claude",
++   provider: "codex",
+    agent,
+  });
+```
+
+Everything else stays the same: streaming, tools, handoffs, middleware — all of it.
+
+<br />
+
+## Supported Providers
+
+| Provider | Package | Agent Backend |
+| :------- | :------ | :------------ |
 | `claude` | [`@anthropic-ai/claude-agent-sdk`](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) | Claude Code |
 | `codex` | [`@openai/codex-sdk`](https://www.npmjs.com/package/@openai/codex-sdk) | ChatGPT Codex |
 | `kimi` | [`@moonshot-ai/kimi-agent-sdk`](https://www.npmjs.com/package/@moonshot-ai/kimi-agent-sdk) | Kimi-CLI |
 
 All providers are **optional peer dependencies** — install only what you need. You can also [register custom providers](#custom-providers).
 
-## Getting started
+<br />
+
+## Getting Started
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+ or [Bun](https://bun.sh/)
 - At least one provider CLI installed and authenticated (e.g. Claude Code)
 
-### Installation
-
-Install the SDK:
+### Install
 
 ```bash
 npm install one-agent-sdk
-# or
-pnpm add one-agent-sdk
-# or
-bun add one-agent-sdk
 ```
 
-Then install the provider SDK for your backend:
+Then install your provider:
 
 ```bash
 # Pick one (or more)
@@ -72,12 +86,13 @@ npm install @openai/codex-sdk
 npm install @moonshot-ai/kimi-agent-sdk
 ```
 
-### Quick start
+### Quick Start
 
 ```typescript
 import { z } from "zod";
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
+// Define a tool with Zod — type-safe across all providers
 const weatherTool = defineTool({
   name: "get_weather",
   description: "Get the current weather for a city",
@@ -89,6 +104,7 @@ const weatherTool = defineTool({
   },
 });
 
+// Define an agent
 const agent = defineAgent({
   name: "assistant",
   description: "A helpful assistant",
@@ -96,6 +112,7 @@ const agent = defineAgent({
   tools: [weatherTool],
 });
 
+// Run it
 const { stream } = await run("What's the weather in San Francisco?", {
   provider: "claude",
   agent,
@@ -109,11 +126,13 @@ for await (const chunk of stream) {
 > [!TIP]
 > To switch providers, just change `provider: "claude"` to `"codex"` or `"kimi"`. Everything else stays the same.
 
+<br />
+
 ## Features
 
-### Multi-agent handoffs
+### Multi-Agent Handoffs
 
-Agents can hand off tasks to each other. Define who can talk to whom, and the SDK handles routing across all providers.
+Agents hand off tasks to each other seamlessly. Define who can talk to whom — the SDK handles routing across all providers.
 
 ```typescript
 const researcher = defineAgent({
@@ -144,9 +163,9 @@ for await (const chunk of stream) {
 }
 ```
 
-### Structured output
+### Structured Output
 
-`runToCompletion` accepts a `responseSchema` to parse and validate the agent's response against a Zod schema:
+Validate agent responses against Zod schemas with `runToCompletion`:
 
 ```typescript
 import { z } from "zod";
@@ -168,7 +187,7 @@ const city = await runToCompletion("Give me info about Tokyo as JSON.", {
 
 ### Sessions
 
-`createSession` manages multi-turn conversation history, with pluggable storage backends:
+Multi-turn conversation history with pluggable storage:
 
 ```typescript
 import { createSession } from "one-agent-sdk";
@@ -187,7 +206,7 @@ Implement the `SessionStore` interface to persist history to a database or file 
 
 ### Middleware
 
-Transform the stream between the provider and your application with composable middleware:
+Composable stream transformations between the provider and your application:
 
 ```typescript
 import { defineMiddleware, run } from "one-agent-sdk";
@@ -206,31 +225,65 @@ const { stream } = await run("Hello", {
 });
 ```
 
-### Custom providers
+The SDK ships with built-in middleware for logging, usage tracking, timing, text collection, guardrails, hooks, and filtering.
 
-Register your own provider backend with `registerProvider`:
+### Custom Providers
+
+Register your own provider backend:
 
 ```typescript
 import { registerProvider, run } from "one-agent-sdk";
 
-registerProvider("my-llm", async (config) => {
-  // Return a ProviderBackend: { run, chat, close }
-  return {
-    async *run(prompt) { yield { type: "text", text: "Hello from my-llm!" }; yield { type: "done" }; },
-    async *chat(msg) { yield { type: "text", text: msg }; yield { type: "done" }; },
-    async close() {},
-  };
-});
+registerProvider("my-llm", async (config) => ({
+  async *run(prompt) {
+    yield { type: "text", text: "Hello from my-llm!" };
+    yield { type: "done" };
+  },
+  async *chat(msg) {
+    yield { type: "text", text: msg };
+    yield { type: "done" };
+  },
+  async close() {},
+}));
 
 const { stream } = await run("Hi", { provider: "my-llm", agent });
 ```
 
-## Stream events
+<br />
+
+## How It Works
+
+```mermaid
+graph LR
+    A["run(prompt, config)"] --> B{Provider Registry}
+    B --> C[Claude Code]
+    B --> D[Codex]
+    B --> E[Kimi]
+    B --> F[Custom]
+    C --> G[Middleware Pipeline]
+    D --> G
+    E --> G
+    F --> G
+    G --> H["{ stream, chat, close }"]
+```
+
+Each provider adapts its native SDK to a unified `StreamChunk` interface:
+
+- **Claude Code** — wraps the Claude Agent SDK. Tools are exposed via an in-process MCP server.
+- **Codex** — wraps the Codex SDK. Zod schemas are converted to JSON Schema automatically.
+- **Kimi** — wraps the Kimi Agent SDK. Uses `createSession`/`createExternalTool`.
+
+> [!NOTE]
+> Provider SDKs are dynamically imported at runtime — unused providers are never loaded.
+
+<br />
+
+## Stream Events
 
 All providers emit the same `StreamChunk` discriminated union:
 
 | Type | Fields | Description |
-| --- | --- | --- |
+| :--- | :----- | :---------- |
 | `text` | `text` | Generated text delta |
 | `tool_call` | `toolName`, `toolArgs`, `toolCallId` | Agent is calling a tool |
 | `tool_result` | `toolCallId`, `result` | Tool returned a result |
@@ -238,10 +291,12 @@ All providers emit the same `StreamChunk` discriminated union:
 | `error` | `error` | Something went wrong |
 | `done` | `text?`, `usage?` | Run completed |
 
-## API reference
+<br />
+
+## API Reference
 
 | Function | Description |
-| --- | --- |
+| :------- | :---------- |
 | `run(prompt, config)` | Start a streaming agent run. Returns `{ stream, chat, close }` |
 | `runToCompletion(prompt, config)` | Run and return the final text (or validated object with `responseSchema`) |
 | `defineAgent({...})` | Define an agent with prompt, tools, and handoffs |
@@ -258,40 +313,32 @@ All providers emit the same `StreamChunk` discriminated union:
 
 For full API documentation, see the [docs site](https://odysa.github.io/one-agent-sdk/).
 
+<br />
+
 ## Examples
 
 The [`examples/`](./examples) directory contains runnable demos:
 
 | Example | Description |
-| --- | --- |
+| :------ | :---------- |
 | [`hello.ts`](./examples/hello.ts) | Minimal agent, no tools |
 | [`multi-agent.ts`](./examples/multi-agent.ts) | Two agents handing off to each other |
 | [`claude.ts`](./examples/claude.ts) | Claude-specific example |
 | [`codex.ts`](./examples/codex.ts) | Codex-specific example |
 | [`kimi.ts`](./examples/kimi.ts) | Kimi-specific example |
 
-Run any example with:
-
 ```bash
 npx tsx examples/hello.ts
 ```
 
-## How it works
+<br />
 
-```
-run(prompt, config)
-  → resolves provider (registry or built-in)
-  → applies middleware pipeline
-  → returns { stream, chat, close }
-```
+## Contributing
 
-Each provider adapts its native SDK to the unified `StreamChunk` interface:
+Contributions are welcome! Please see the [contributing guide](CONTRIBUTING.md) for details.
 
-- **Claude** — wraps the Claude Agent SDK. Tools are exposed via an in-process MCP server.
-- **Codex** — wraps the Codex SDK. Zod schemas are converted to JSON Schema automatically.
-- **Kimi** — wraps the Kimi Agent SDK. Uses `createSession`/`createExternalTool`.
+<br />
 
-Handoffs work differently per provider but produce identical `handoff` stream events. Claude uses its SDK's built-in agent support, while Codex and Kimi use synthetic `transfer_to_{name}` tools.
+## License
 
-> [!NOTE]
-> Provider SDKs are dynamically imported at runtime, so unused providers are never loaded.
+[MIT](LICENSE)
