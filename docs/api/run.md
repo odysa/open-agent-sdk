@@ -21,7 +21,7 @@ function run(prompt: string, config: RunConfig): Promise<AgentRun>
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `provider` | `"claude" \| "codex" \| "kimi"` | Yes | Backend provider |
+| `provider` | `string` | Yes | Backend provider (`"claude"`, `"codex"`, `"kimi"`, or a custom name) |
 | `agent` | [`AgentDef`](/api/types#agentdef) | Yes | The agent definition |
 | `agents` | `Record<string, AgentDef>` | No | Agent map for handoffs |
 | `mcpServers` | `Record<string, McpServerConfig>` | No | MCP server configs |
@@ -29,6 +29,8 @@ function run(prompt: string, config: RunConfig): Promise<AgentRun>
 | `workDir` | `string` | No | Working directory |
 | `maxTurns` | `number` | No | Limit tool-use turns |
 | `signal` | `AbortSignal` | No | Cancellation signal |
+| `middleware` | [`Middleware[]`](/api/middleware) | No | Stream middleware pipeline |
+| `responseSchema` | `z.ZodType` | No | Zod schema for structured output (used by `runToCompletion`) |
 
 ## Returns
 
