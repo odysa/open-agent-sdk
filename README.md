@@ -5,7 +5,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**One SDK for every coding agent.** Build LLM-powered agents once and run them on any backend — no more rewriting your tools, streaming logic, or handoff code when you switch between Claude Code, ChatGPT Codex, and Kimi-CLI. Define agents and tools with a single TypeScript API, and swap providers with one line.
+**One SDK for every coding agent.** Embed in-process coding agents — like Claude Code, ChatGPT Codex, and Kimi-CLI — directly into your TypeScript applications. Build agents once and run them on any backend: no more rewriting tools, streaming logic, or handoff code when you switch providers. One API, one line to swap.
 
 ```typescript
 const { stream } = await run("What's the weather?", {
