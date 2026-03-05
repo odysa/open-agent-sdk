@@ -75,6 +75,8 @@ export interface RunConfig {
   maxTurns?: number;
   signal?: AbortSignal;
   middleware?: Middleware[];
+  /** Zod schema for structured output validation */
+  responseSchema?: z.ZodType;
 }
 
 /** Handle returned by run() */

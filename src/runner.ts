@@ -1,7 +1,9 @@
+import type { z } from "zod";
 import { applyMiddleware } from "./middleware.js";
 import type { ProviderBackend } from "./providers/types.js";
 import { getProvider } from "./registry.js";
 import type { AgentRun, RunConfig } from "./types.js";
+import { extractJson } from "./utils/extract-json.js";
 
 async function createProvider(config: RunConfig): Promise<ProviderBackend> {
   // Check registry first (custom providers)
@@ -52,7 +54,16 @@ export async function run(prompt: string, config: RunConfig): Promise<AgentRun> 
 }
 
 /** Convenience: run to completion and return collected text */
-export async function runToCompletion(prompt: string, config: RunConfig): Promise<string> {
+export async function runToCompletion(prompt: string, config: RunConfig): Promise<string>;
+/** Convenience: run to completion and parse/validate against a Zod schema */
+export async function runToCompletion<T extends z.ZodType>(
+  prompt: string,
+  config: RunConfig & { responseSchema: T },
+): Promise<z.infer<T>>;
+export async function runToCompletion<T extends z.ZodType>(
+  prompt: string,
+  config: RunConfig & { responseSchema?: T },
+): Promise<string | z.infer<T>> {
   const { stream, close } = await run(prompt, config);
   let text = "";
 
@@ -63,5 +74,23 @@ export async function runToCompletion(prompt: string, config: RunConfig): Promis
   }
 
   await close();
-  return text;
+
+  if (!config.responseSchema) {
+    return text;
+  }
+
+  const jsonText = extractJson(text);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    throw new Error(`Failed to parse response as JSON: ${jsonText}`);
+  }
+
+  const result = config.responseSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new Error(`Response validation failed: ${JSON.stringify(result.error.issues, null, 2)}`);
+  }
+
+  return result.data;
 }
