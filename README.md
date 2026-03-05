@@ -1,6 +1,10 @@
 # One Agent SDK
 
-**Write once. Run anywhere.** A TypeScript SDK that lets you build LLM agents with tools and multi-agent handoffs — then swap providers with a single line change.
+[![npm](https://img.shields.io/npm/v/one-agent-sdk)](https://www.npmjs.com/package/one-agent-sdk)
+[![CI](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+**One SDK for every coding agent.** Run in-process agents powered by Claude Code, ChatGPT Codex, and Kimi-CLI — with a unified streaming interface, type-safe tools, and multi-agent handoffs.
 
 ```typescript
 const { stream } = await run("What's the weather?", {
