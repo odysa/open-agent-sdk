@@ -18,6 +18,11 @@ describe("extractJson", () => {
     expect(extractJson(fenced)).toBe('{"name":"Alice","age":30}');
   });
 
+  test("extracts JSON from fences with surrounding text", () => {
+    const withText = 'Here is the result:\n```json\n{"name":"Alice"}\n```\nHope that helps!';
+    expect(extractJson(withText)).toBe('{"name":"Alice"}');
+  });
+
   test("trims surrounding whitespace", () => {
     const raw = '  {"x":1}  ';
     expect(extractJson(raw)).toBe('{"x":1}');
