@@ -1,7 +1,7 @@
-import type { RunConfig, AgentRun, StreamChunk } from "./types.js";
-import type { Provider } from "./providers/types.js";
+import type { ProviderBackend } from "./providers/types.js";
+import type { AgentRun, RunConfig } from "./types.js";
 
-async function createProvider(config: RunConfig): Promise<Provider> {
+async function createProvider(config: RunConfig): Promise<ProviderBackend> {
   switch (config.provider) {
     case "claude": {
       const { createClaudeProvider } = await import("./providers/claude.js");
@@ -16,9 +16,7 @@ async function createProvider(config: RunConfig): Promise<Provider> {
       return createKimiProvider(config);
     }
     default:
-      throw new Error(
-        `Unknown provider: ${config.provider}. Use: claude, openai, kimi`
-      );
+      throw new Error(`Unknown provider: ${config.provider}. Use: claude, openai, kimi`);
   }
 }
 
@@ -35,10 +33,7 @@ export async function run(prompt: string, config: RunConfig): Promise<AgentRun> 
 }
 
 /** Convenience: run to completion and return collected text */
-export async function runToCompletion(
-  prompt: string,
-  config: RunConfig
-): Promise<string> {
+export async function runToCompletion(prompt: string, config: RunConfig): Promise<string> {
   const provider = await createProvider(config);
   let text = "";
 

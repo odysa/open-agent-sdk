@@ -8,7 +8,7 @@ declare module "@anthropic-ai/claude-agent-sdk" {
     name: string,
     description: string,
     parameters: any,
-    handler: (args: any) => Promise<any>
+    handler: (args: any) => Promise<any>,
   ): any;
 }
 

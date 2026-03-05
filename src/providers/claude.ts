@@ -1,15 +1,13 @@
-import type { Provider } from "./types.js";
-import type { StreamChunk, RunConfig, ToolDef, AgentDef } from "../types.js";
+import type { AgentDef, RunConfig, StreamChunk, ToolDef } from "../types.js";
+import type { ProviderBackend } from "./types.js";
 
-export async function createClaudeProvider(
-  config: RunConfig
-): Promise<Provider> {
+export async function createClaudeProvider(config: RunConfig): Promise<ProviderBackend> {
   let claudeSdk: any;
   try {
     claudeSdk = await import("@anthropic-ai/claude-agent-sdk");
   } catch {
     throw new Error(
-      'Claude provider requires @anthropic-ai/claude-agent-sdk. Install it with: bun add @anthropic-ai/claude-agent-sdk'
+      "Claude provider requires @anthropic-ai/claude-agent-sdk. Install it with: bun add @anthropic-ai/claude-agent-sdk",
     );
   }
 
@@ -29,12 +27,10 @@ export async function createClaudeProvider(
         tool(t.name, t.description, t.parameters, async (args: any) => {
           const result = await t.handler(args);
           return { content: [{ type: "text" as const, text: result }] };
-        })
+        }),
       ),
     });
-    toolNames = agentTools.map(
-      (t: ToolDef) => `mcp__${serverName}__${t.name}`
-    );
+    toolNames = agentTools.map((t: ToolDef) => `mcp__${serverName}__${t.name}`);
   }
 
   // Merge MCP servers: user-tool server + agent-level + run-level
@@ -46,10 +42,11 @@ export async function createClaudeProvider(
   // Build agent definitions for handoffs
   let agents: any[] | undefined;
   if (config.agent.handoffs?.length && config.agents) {
+    const agentsMap = config.agents;
     agents = config.agent.handoffs
-      .map((name) => config.agents![name])
-      .filter(Boolean)
-      .map((a: AgentDef) => ({
+      .map((name) => agentsMap[name])
+      .filter((a): a is AgentDef => !!a)
+      .map((a) => ({
         name: a.name,
         description: a.description,
         instructions: a.prompt,
@@ -105,10 +102,7 @@ export async function createClaudeProvider(
         yield {
           type: "tool_result",
           toolCallId: msg.tool_use_id ?? "",
-          result:
-            typeof msg.content === "string"
-              ? msg.content
-              : JSON.stringify(msg.content),
+          result: typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content),
         };
       }
     }

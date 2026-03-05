@@ -1,15 +1,14 @@
-import type { Provider } from "./types.js";
-import type { StreamChunk, RunConfig, ToolDef, AgentDef } from "../types.js";
+import type { RunConfig, StreamChunk, ToolDef } from "../types.js";
+import { handoffToolName, parseHandoff } from "../utils/handoff.js";
+import type { ProviderBackend } from "./types.js";
 
-export async function createKimiProvider(
-  config: RunConfig
-): Promise<Provider> {
+export async function createKimiProvider(config: RunConfig): Promise<ProviderBackend> {
   let kimiSdk: any;
   try {
     kimiSdk = await import("@moonshot-ai/kimi-agent-sdk");
   } catch {
     throw new Error(
-      'Kimi provider requires @moonshot-ai/kimi-agent-sdk. Install it with: bun add @moonshot-ai/kimi-agent-sdk'
+      "Kimi provider requires @moonshot-ai/kimi-agent-sdk. Install it with: bun add @moonshot-ai/kimi-agent-sdk",
     );
   }
 
@@ -27,7 +26,7 @@ export async function createKimiProvider(
         const result = await t.handler(params);
         return { output: result, message: "ok" };
       },
-    })
+    }),
   );
 
   // Add synthetic handoff tools
@@ -37,13 +36,13 @@ export async function createKimiProvider(
     const targetAgent = config.agents?.[targetName];
     externalTools.push(
       createExternalTool({
-        name: `transfer_to_${targetName}`,
+        name: handoffToolName(targetName),
         description: targetAgent?.description ?? `Transfer to ${targetName}`,
         parameters: {} as any,
         handler: async () => {
           return { output: `Transferred to ${targetName}`, message: "ok" };
         },
-      })
+      }),
     );
   }
 
@@ -77,14 +76,14 @@ export async function createKimiProvider(
         };
 
         // Check for handoff
-        if (name.startsWith("transfer_to_")) {
-          const targetName = name.slice("transfer_to_".length);
-          const targetAgent = config.agents?.[targetName];
+        const handoffTarget = parseHandoff(name);
+        if (handoffTarget) {
+          const targetAgent = config.agents?.[handoffTarget];
           if (targetAgent) {
             yield {
               type: "handoff",
               fromAgent: currentAgent.name,
-              toAgent: targetName,
+              toAgent: handoffTarget,
             };
             currentAgent = targetAgent;
           }
