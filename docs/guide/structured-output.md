@@ -23,7 +23,7 @@ const City = z.object({
 });
 
 const city = await runToCompletion("Give me info about Tokyo as JSON.", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   responseSchema: City,
 });
@@ -49,7 +49,7 @@ Two types of errors can occur:
 ```typescript
 try {
   const result = await runToCompletion("...", {
-    provider: "claude",
+    provider: "claude-code",
     agent,
     responseSchema: MySchema,
   });
@@ -75,7 +75,7 @@ When called without `responseSchema`, `runToCompletion()` returns a plain string
 
 ```typescript
 const text = await runToCompletion("What is 2 + 2?", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 // text: string

@@ -23,7 +23,7 @@ async function main() {
   console.log("Running kimi example...");
 
   const { stream } = await run("What's the weather in Beijing?", {
-    provider: "kimi",
+    provider: "kimi-cli",
     agent,
   });
 

@@ -43,7 +43,7 @@ const agent = defineAgent({
 const session = createSession();
 
 const { stream } = await session.run("My name is Alice.", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 

@@ -65,7 +65,7 @@ async function main() {
   const { stream } = await run(
     "What is the population of Tokyo? Then calculate what 15% of that number is.",
     {
-      provider: "claude",
+      provider: "claude-code",
       agent: researcher,
       agents: {
         researcher,

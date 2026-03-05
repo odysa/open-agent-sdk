@@ -94,7 +94,7 @@ interface McpServerConfig {
 Supported provider backends. Includes built-in providers and any registered custom providers.
 
 ```typescript
-type BuiltinProvider = "claude" | "codex" | "kimi";
+type BuiltinProvider = "claude-code" | "codex" | "kimi-cli";
 type Provider = BuiltinProvider | (string & {});
 ```
 

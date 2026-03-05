@@ -36,8 +36,8 @@ describe("registerProvider / getProvider", () => {
 
   test("custom provider overrides built-in if same name is used", async () => {
     const { provider, calls } = createMockProvider([{ type: "done" }]);
-    registerProvider("claude", async () => provider);
-    const handle = await run("hello", { provider: "claude", agent });
+    registerProvider("claude-code", async () => provider);
+    const handle = await run("hello", { provider: "claude-code", agent });
     for await (const _ of handle.stream) {
       // drain
     }
@@ -77,9 +77,9 @@ describe("run() with registered provider", () => {
 
   test("built-in provider names remain valid type-level values", () => {
     // This is a compile-time check — just ensure the type assignment works
-    const p1: import("../types.js").BuiltinProvider = "claude";
+    const p1: import("../types.js").BuiltinProvider = "claude-code";
     const p2: import("../types.js").BuiltinProvider = "codex";
-    const p3: import("../types.js").BuiltinProvider = "kimi";
-    expect([p1, p2, p3]).toEqual(["claude", "codex", "kimi"]);
+    const p3: import("../types.js").BuiltinProvider = "kimi-cli";
+    expect([p1, p2, p3]).toEqual(["claude-code", "codex", "kimi-cli"]);
   });
 });

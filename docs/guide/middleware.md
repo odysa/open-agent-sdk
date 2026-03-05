@@ -12,7 +12,7 @@ import { run, logging, usageTracker, timing } from "one-agent-sdk";
 const tracker = usageTracker();
 
 const { stream } = await run("Summarize this article", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   middleware: [
     logging(),

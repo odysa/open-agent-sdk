@@ -5,7 +5,7 @@ import { collect, fromChunks } from "./mock-provider.js";
 
 const mockContext: MiddlewareContext = {
   agent: { name: "test-agent", description: "Test", prompt: "You are a test agent." },
-  provider: "claude",
+  provider: "claude-code",
 };
 
 describe("defineMiddleware", () => {

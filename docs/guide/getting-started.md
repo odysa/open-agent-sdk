@@ -70,7 +70,7 @@ const agent = defineAgent({
 
 // Run — swap provider by changing this value
 const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "claude", // "claude" | "codex" | "kimi"
+  provider: "claude-code", // "claude-code" | "codex" | "kimi-cli"
   agent,
 });
 

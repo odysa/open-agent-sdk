@@ -21,7 +21,7 @@ function run(prompt: string, config: RunConfig): Promise<AgentRun>
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `provider` | `string` | Yes | Backend provider (`"claude"`, `"codex"`, `"kimi"`, or a custom name) |
+| `provider` | `string` | Yes | Backend provider (`"claude-code"`, `"codex"`, `"kimi-cli"`, or a custom name) |
 | `agent` | [`AgentDef`](/api/types#agentdef) | Yes | The agent definition |
 | `agents` | `Record<string, AgentDef>` | No | Agent map for handoffs |
 | `mcpServers` | `Record<string, McpServerConfig>` | No | MCP server configs |
@@ -54,7 +54,7 @@ const agent = defineAgent({
 });
 
 const { stream, chat, close } = await run("Hello!", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 

@@ -20,7 +20,7 @@ The stream yields a discriminated union with these variants:
 Use a `for await...of` loop with a `switch` statement to handle each chunk type:
 
 ```typescript
-const { stream } = await run("Hello", { provider: "claude", agent });
+const { stream } = await run("Hello", { provider: "claude-code", agent });
 
 for await (const chunk of stream) {
   switch (chunk.type) {
@@ -54,7 +54,7 @@ If you only need the final text output, use `runToCompletion()`:
 import { runToCompletion } from "one-agent-sdk";
 
 const text = await runToCompletion("What is 2 + 2?", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 
@@ -67,7 +67,7 @@ Use the `chat()` function to send follow-up messages in the same conversation:
 
 ```typescript
 const { stream, chat, close } = await run("Hello", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 
@@ -94,7 +94,7 @@ Pass an `AbortSignal` to cancel a run:
 const controller = new AbortController();
 
 const { stream } = await run("Write a long story", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   signal: controller.signal,
 });

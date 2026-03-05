@@ -30,7 +30,7 @@ When `responseSchema` is provided, the response is parsed as JSON and validated 
 
 ```typescript
 const text = await runToCompletion("What is 2 + 2?", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 
@@ -49,7 +49,7 @@ const City = z.object({
 });
 
 const city = await runToCompletion("Give me info about Tokyo as JSON.", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   responseSchema: City,
 });

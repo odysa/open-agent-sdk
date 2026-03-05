@@ -14,7 +14,7 @@ npm install @anthropic-ai/claude-agent-sdk
 
 ```typescript
 const { stream } = await run("Hello", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 ```
@@ -52,7 +52,7 @@ npm install @moonshot-ai/kimi-agent-sdk
 
 ```typescript
 const { stream } = await run("Hello", {
-  provider: "kimi",
+  provider: "kimi-cli",
   agent,
 });
 ```
@@ -67,7 +67,7 @@ Pass provider-specific options via `providerOptions`:
 
 ```typescript
 const { stream } = await run("Hello", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   providerOptions: {
     // Provider-specific configuration
@@ -81,7 +81,7 @@ Changing the provider is a one-line change:
 
 ```typescript
 // Just change this string
-const provider = "claude"; // or "codex" or "kimi"
+const provider = "claude-code"; // or "codex" or "kimi-cli"
 
 const { stream } = await run("Hello", { provider, agent });
 ```

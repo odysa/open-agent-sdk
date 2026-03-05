@@ -23,7 +23,7 @@ async function main() {
   console.log("Running claude example...");
 
   const { stream } = await run("What's the weather in San Francisco?", {
-    provider: "claude",
+    provider: "claude-code",
     agent,
   });
 

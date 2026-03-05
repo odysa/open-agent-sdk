@@ -7,7 +7,7 @@ const agent = defineAgent({
 });
 
 async function main() {
-  const provider = (process.argv[2] as "claude" | "codex" | "kimi") ?? "claude";
+  const provider = (process.argv[2] as "claude-code" | "codex" | "kimi-cli") ?? "claude-code";
 
   console.log(`Running hello example with provider: ${provider}...`);
 

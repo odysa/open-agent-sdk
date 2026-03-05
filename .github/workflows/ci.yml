@@ -8,7 +8,7 @@ on:
 
 jobs:
   check:
-    name: Lint & Type Check
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

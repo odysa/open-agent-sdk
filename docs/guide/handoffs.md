@@ -47,7 +47,7 @@ const mathAgent = defineAgent({
 const { stream } = await run(
   "What is the population of Tokyo? Then calculate 15% of that.",
   {
-    provider: "claude",
+    provider: "claude-code",
     agent: researcher,
     agents: { researcher, math: mathAgent },
   },
@@ -78,7 +78,7 @@ The `agents` map passed to `run()` must include all agents that could be reached
 
 ```typescript
 await run(prompt, {
-  provider: "claude",
+  provider: "claude-code",
   agent: entryAgent,       // The starting agent
   agents: {                // All reachable agents
     entry: entryAgent,

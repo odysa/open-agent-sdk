@@ -12,7 +12,7 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
 
   // Built-in providers
   switch (config.provider) {
-    case "claude": {
+    case "claude-code": {
       const { createClaudeProvider } = await import("./providers/claude.js");
       return createClaudeProvider(config);
     }
@@ -20,13 +20,13 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       const { createCodexProvider } = await import("./providers/codex.js");
       return createCodexProvider(config);
     }
-    case "kimi": {
+    case "kimi-cli": {
       const { createKimiProvider } = await import("./providers/kimi.js");
       return createKimiProvider(config);
     }
     default:
       throw new Error(
-        `Unknown provider: ${config.provider}. Use: claude, codex, kimi, or register a custom provider with registerProvider()`,
+        `Unknown provider: ${config.provider}. Use: claude-code, codex, kimi-cli, or register a custom provider with registerProvider()`,
       );
   }
 }

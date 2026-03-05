@@ -25,7 +25,7 @@
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
 const { stream } = await run("What's the weather?", {
-  provider: "claude",  // swap to "codex" or "kimi" — same code, different backend
+  provider: "claude-code",  // swap to "codex" or "kimi-cli" — same code, different backend
   agent,
 });
 ```
@@ -42,7 +42,7 @@ One Agent SDK gives you a single, provider-agnostic interface. Write your agents
 
 ```diff
   const { stream } = await run("Analyze this code", {
--   provider: "claude",
+-   provider: "claude-code",
 +   provider: "codex",
     agent,
   });
@@ -56,9 +56,9 @@ Everything else stays the same: streaming, tools, handoffs, middleware — all o
 
 | Provider | Package | Agent Backend |
 | :------- | :------ | :------------ |
-| `claude` | [`@anthropic-ai/claude-agent-sdk`](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) | Claude Code |
+| `claude-code` | [`@anthropic-ai/claude-agent-sdk`](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) | Claude Code |
 | `codex` | [`@openai/codex-sdk`](https://www.npmjs.com/package/@openai/codex-sdk) | ChatGPT Codex |
-| `kimi` | [`@moonshot-ai/kimi-agent-sdk`](https://www.npmjs.com/package/@moonshot-ai/kimi-agent-sdk) | Kimi-CLI |
+| `kimi-cli` | [`@moonshot-ai/kimi-agent-sdk`](https://www.npmjs.com/package/@moonshot-ai/kimi-agent-sdk) | Kimi-CLI |
 
 All providers are **optional peer dependencies** — install only what you need. You can also [register custom providers](#custom-providers).
 
@@ -114,7 +114,7 @@ const agent = defineAgent({
 
 // Run it
 const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 
@@ -124,7 +124,7 @@ for await (const chunk of stream) {
 ```
 
 > [!TIP]
-> To switch providers, just change `provider: "claude"` to `"codex"` or `"kimi"`. Everything else stays the same.
+> To switch providers, just change `provider: "claude-code"` to `"codex"` or `"kimi-cli"`. Everything else stays the same.
 
 <br />
 
@@ -152,7 +152,7 @@ const math = defineAgent({
 });
 
 const { stream } = await run("Population of Tokyo? Then calculate 15% of it.", {
-  provider: "claude",
+  provider: "claude-code",
   agent: researcher,
   agents: { researcher, math },
 });
@@ -178,7 +178,7 @@ const City = z.object({
 });
 
 const city = await runToCompletion("Give me info about Tokyo as JSON.", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   responseSchema: City,
 });
@@ -219,7 +219,7 @@ const logger = defineMiddleware(async function* (stream, context) {
 });
 
 const { stream } = await run("Hello", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
   middleware: [logger],
 });

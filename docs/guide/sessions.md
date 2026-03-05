@@ -22,7 +22,7 @@ Use `session.run()` instead of `run()` — the API is the same, but conversation
 
 ```typescript
 const first = await session.run("My name is Alice.", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 for await (const chunk of first.stream) {
@@ -31,7 +31,7 @@ for await (const chunk of first.stream) {
 
 // The agent remembers the previous turn
 const second = await session.run("What's my name?", {
-  provider: "claude",
+  provider: "claude-code",
   agent,
 });
 for await (const chunk of second.stream) {

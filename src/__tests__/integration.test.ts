@@ -17,7 +17,7 @@ describe("full agent run simulation", () => {
       { type: "done", text: "Hello! How can I help?" },
     ]);
 
-    const text = await collectText(provider.run("hi", { provider: "claude", agent }));
+    const text = await collectText(provider.run("hi", { provider: "claude-code", agent }));
     expect(text).toBe("Hello! How can I help?");
   });
 
@@ -56,7 +56,9 @@ describe("full agent run simulation", () => {
       },
     ]);
 
-    const chunks = await collect(provider.run("weather in SF?", { provider: "claude", agent }));
+    const chunks = await collect(
+      provider.run("weather in SF?", { provider: "claude-code", agent }),
+    );
 
     // Verify chunk sequence
     expect(chunks.map((c) => c.type)).toEqual(["tool_call", "tool_result", "text", "done"]);
@@ -99,7 +101,7 @@ describe("full agent run simulation", () => {
 
     const chunks = await collect(
       provider.run("what is 2+2?", {
-        provider: "claude",
+        provider: "claude-code",
         agent: researcher,
         agents: { researcher, math: mathAgent },
       }),
@@ -133,7 +135,7 @@ describe("full agent run simulation", () => {
       { type: "done", text: "Trying... Retried successfully." },
     ]);
 
-    const chunks = await collect(provider.run("do something", { provider: "claude", agent }));
+    const chunks = await collect(provider.run("do something", { provider: "claude-code", agent }));
 
     expect(chunks.map((c) => c.type)).toEqual(["text", "error", "text", "done"]);
     const error = chunks.find((c) => c.type === "error");
@@ -155,7 +157,7 @@ describe("full agent run simulation", () => {
     ]);
 
     // First turn
-    const first = await collectText(mock.provider.run("hi", { provider: "claude", agent }));
+    const first = await collectText(mock.provider.run("hi", { provider: "claude-code", agent }));
     expect(first).toBe("Hello!");
 
     // Second turn (chat)
@@ -213,7 +215,7 @@ describe("full agent run simulation", () => {
     ]);
 
     const chunks = await collect(
-      provider.run("15% of Tokyo population?", { provider: "claude", agent }),
+      provider.run("15% of Tokyo population?", { provider: "claude-code", agent }),
     );
 
     const toolCalls = chunks.filter((c) => c.type === "tool_call");

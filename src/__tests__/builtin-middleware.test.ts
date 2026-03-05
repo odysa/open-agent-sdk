@@ -13,7 +13,7 @@ import { collect, fromChunks } from "./mock-provider.js";
 
 const ctx: MiddlewareContext = {
   agent: { name: "test", description: "Test", prompt: "Test" },
-  provider: "claude",
+  provider: "claude-code",
 };
 
 function apply(chunks: StreamChunk[], mw: ReturnType<typeof logging>) {
