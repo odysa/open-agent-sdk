@@ -25,9 +25,9 @@ const agent = defineAgent({
 });
 
 async function main() {
-  // Switch provider by changing this value: "claude" | "openai" | "kimi"
+  // Switch provider by changing this value: "claude" | "codex" | "kimi"
   const { stream } = await run("What's the weather in San Francisco?", {
-    provider: "openai",
+    provider: "claude",
     agent,
   });
 

@@ -6,11 +6,11 @@ A provider-agnostic TypeScript SDK for building LLM agents with tools and multi-
 
 | Provider | SDK | Coding Agent |
 | -------- | --- | ------------ |
-| **Claude** | `@anthropic-ai/claude-agent-sdk` | Claude Code |
-| **OpenAI** | `openai` | ChatGPT Codex |
-| **Kimi** | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
+| **claude** | `@anthropic-ai/claude-agent-sdk` | Claude Code |
+| **codex** | `@openai/codex-sdk` | ChatGPT Codex |
+| **kimi** | `@moonshot-ai/kimi-agent-sdk` | Kimi-CLI |
 
-All providers are optional peer dependencies — install only the ones you need.
+All providers are optional peer dependencies — install only the ones you need. Each provider spawns the corresponding coding agent CLI as a subprocess, so no API keys are needed.
 
 ## Installation
 
@@ -31,13 +31,13 @@ bun add one-agent-sdk
 Then install the provider SDK for your backend:
 
 ```bash
-# For Claude
+# For Claude Code
 npm install @anthropic-ai/claude-agent-sdk
 
-# For OpenAI
-npm install openai
+# For ChatGPT Codex
+npm install @openai/codex-sdk
 
-# For Kimi
+# For Kimi-CLI
 npm install @moonshot-ai/kimi-agent-sdk
 ```
 
@@ -69,7 +69,7 @@ const agent = defineAgent({
 
 // Run — swap provider by changing this value
 const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "openai", // "claude" | "openai" | "kimi"
+  provider: "claude", // "claude" | "codex" | "kimi"
   agent,
 });
 
@@ -102,7 +102,7 @@ const mathAgent = defineAgent({
 });
 
 const { stream } = await run("What is the population of Tokyo? Then calculate 15% of that.", {
-  provider: "openai",
+  provider: "claude",
   agent: researcher,
   agents: { researcher, math: mathAgent },
 });
@@ -126,7 +126,7 @@ for await (const chunk of stream) {
 Starts a streaming agent run.
 
 - **`prompt`** — the user message
-- **`config.provider`** — `"claude"` | `"openai"` | `"kimi"`
+- **`config.provider`** — `"claude"` | `"codex"` | `"kimi"`
 - **`config.agent`** — the agent definition
 - **`config.agents`** — map of agent names to definitions (for handoffs)
 - **`config.maxTurns`** — limit tool-use turns

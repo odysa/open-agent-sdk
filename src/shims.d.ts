@@ -12,16 +12,21 @@ declare module "@anthropic-ai/claude-agent-sdk" {
   ): any;
 }
 
-declare module "openai" {
-  class OpenAI {
-    constructor(options?: { apiKey?: string });
-    chat: {
-      completions: {
-        create(options: any): Promise<AsyncIterable<any>>;
-      };
-    };
+declare module "@openai/codex-sdk" {
+  class Codex {
+    constructor(options?: Record<string, unknown>);
+    startThread(options?: Record<string, unknown>): Thread;
+    resumeThread(id: string, options?: Record<string, unknown>): Thread;
   }
-  export default OpenAI;
+  class Thread {
+    get id(): string | null;
+    run(input: string, options?: Record<string, unknown>): Promise<any>;
+    runStreamed(
+      input: string,
+      options?: Record<string, unknown>,
+    ): Promise<{ events: AsyncGenerator<any> }>;
+  }
+  export { Codex, Thread };
 }
 
 declare module "@moonshot-ai/kimi-agent-sdk" {
