@@ -256,7 +256,7 @@ const { stream } = await run("Hi", { provider: "my-llm", agent });
 ```mermaid
 graph LR
     A["run(prompt, config)"] --> B{Provider Registry}
-    B --> C[Claude]
+    B --> C[Claude Code]
     B --> D[Codex]
     B --> E[Kimi]
     B --> F[Custom]
@@ -269,7 +269,7 @@ graph LR
 
 Each provider adapts its native SDK to a unified `StreamChunk` interface:
 
-- **Claude** — wraps the Claude Agent SDK. Tools are exposed via an in-process MCP server.
+- **Claude Code** — wraps the Claude Agent SDK. Tools are exposed via an in-process MCP server.
 - **Codex** — wraps the Codex SDK. Zod schemas are converted to JSON Schema automatically.
 - **Kimi** — wraps the Kimi Agent SDK. Uses `createSession`/`createExternalTool`.
 
