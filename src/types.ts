@@ -46,7 +46,7 @@ export type StreamChunk =
     };
 
 /** Built-in provider backends */
-export type BuiltinProvider = "claude-code" | "codex" | "kimi-cli";
+export type BuiltinProvider = "claude-code" | "codex" | "copilot" | "kimi-cli";
 
 /** Supported provider backends (built-in + registered) */
 export type Provider = BuiltinProvider | (string & {});

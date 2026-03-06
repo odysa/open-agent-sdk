@@ -33,3 +33,32 @@ declare module "@moonshot-ai/kimi-agent-sdk" {
   export function createSession(options: any): any;
   export function createExternalTool(options: any): any;
 }
+
+declare module "@github/copilot-sdk" {
+  class CopilotClient {
+    constructor(options?: Record<string, unknown>);
+    start(): Promise<void>;
+    stop(): Promise<Error[]>;
+    createSession(config?: Record<string, unknown>): Promise<CopilotSession>;
+  }
+  class CopilotSession {
+    sessionId: string;
+    send(options: { prompt: string }): Promise<string>;
+    sendAndWait(
+      options: { prompt: string },
+      timeout?: number,
+    ): Promise<{ data: { content: string } } | undefined>;
+    on(eventType: string, handler: (event: any) => void): () => void;
+    on(handler: (event: any) => void): () => void;
+    abort(): Promise<void>;
+    destroy(): Promise<void>;
+  }
+  function defineTool(options: {
+    name: string;
+    description: string;
+    parameters: any;
+    handler: (args: any) => Promise<any>;
+  }): any;
+  function approveAll(request: any): any;
+  export { CopilotClient, CopilotSession, defineTool, approveAll };
+}

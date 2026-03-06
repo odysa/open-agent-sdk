@@ -24,9 +24,13 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       const { createKimiProvider } = await import("./providers/kimi.js");
       return createKimiProvider(config);
     }
+    case "copilot": {
+      const { createCopilotProvider } = await import("./providers/copilot.js");
+      return createCopilotProvider(config);
+    }
     default:
       throw new Error(
-        `Unknown provider: ${config.provider}. Use: claude-code, codex, kimi-cli, or register a custom provider with registerProvider()`,
+        `Unknown provider: ${config.provider}. Use: claude-code, codex, copilot, kimi-cli, or register a custom provider with registerProvider()`,
       );
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "one-agent-sdk",
   "version": "0.1.6",
-  "description": "Provider-agnostic SDK for building LLM agents — one API for Claude, Codex, and Kimi",
+  "description": "Provider-agnostic SDK for building LLM agents — one API for Claude, Codex, Copilot, and Kimi",
   "keywords": [
     "ai",
     "agent",
@@ -9,6 +9,7 @@
     "claude",
     "openai",
     "codex",
+    "copilot",
     "kimi",
     "streaming",
     "tools",
@@ -50,11 +51,15 @@
   },
   "peerDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.68",
+    "@github/copilot-sdk": "*",
     "@moonshot-ai/kimi-agent-sdk": "*",
     "@openai/codex-sdk": "*"
   },
   "peerDependenciesMeta": {
     "@anthropic-ai/claude-agent-sdk": {
+      "optional": true
+    },
+    "@github/copilot-sdk": {
       "optional": true
     },
     "@openai/codex-sdk": {
