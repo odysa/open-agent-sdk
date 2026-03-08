@@ -10,7 +10,6 @@ import { collect, collectText } from "./mock-provider.js";
 type CreateArgs = Record<string, unknown>;
 let capturedCreateArgs: CreateArgs[] = [];
 let createResponses: AsyncGenerator<any>[] = [];
-let responseIndex = 0;
 
 async function* fakeStream(events: any[]): AsyncGenerator<any> {
   for (const event of events) {
@@ -72,7 +71,7 @@ mock.module("@anthropic-ai/sdk", () => {
     messages = {
       create: (args: CreateArgs) => {
         capturedCreateArgs.push(args);
-        return createResponses[responseIndex++];
+        return createResponses.shift();
       },
     };
   }
@@ -94,7 +93,6 @@ function makeConfig(overrides: Partial<RunConfig> = {}): RunConfig {
 beforeEach(() => {
   capturedCreateArgs = [];
   createResponses = [];
-  responseIndex = 0;
 });
 
 describe("Anthropic provider", () => {
@@ -110,8 +108,9 @@ describe("Anthropic provider", () => {
       ]),
     ];
 
-    const provider = await createAnthropicProvider(makeConfig());
-    const chunks = await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createAnthropicProvider(config);
+    const chunks = await collect(provider.run("hi", config));
 
     expect(chunks.map((c) => c.type)).toEqual(["text", "text", "done"]);
 
@@ -136,8 +135,9 @@ describe("Anthropic provider", () => {
       ]),
     ];
 
-    const provider = await createAnthropicProvider(makeConfig());
-    await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createAnthropicProvider(config);
+    await collect(provider.run("hi", config));
 
     expect(capturedCreateArgs[0].model).toBe("claude-sonnet-4-20250514");
   });
@@ -172,8 +172,9 @@ describe("Anthropic provider", () => {
       ]),
     ];
 
-    const provider = await createAnthropicProvider(makeConfig());
-    await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createAnthropicProvider(config);
+    await collect(provider.run("hi", config));
 
     expect(capturedCreateArgs[0].system).toBe("You are helpful.");
   });
@@ -366,9 +367,10 @@ describe("Anthropic provider", () => {
       ]),
     );
 
-    const provider = await createAnthropicProvider(makeConfig());
+    const config = makeConfig();
+    const provider = await createAnthropicProvider(config);
 
-    await collectText(provider.run("hi", makeConfig()));
+    await collectText(provider.run("hi", config));
     await collectText(provider.chat("how are you?"));
 
     // Two API calls should have been made
@@ -412,8 +414,9 @@ describe("Anthropic provider", () => {
       ]),
     ];
 
-    const provider = await createAnthropicProvider(makeConfig());
-    await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createAnthropicProvider(config);
+    await collect(provider.run("hi", config));
 
     expect(capturedCreateArgs[0].max_tokens).toBe(8192);
   });

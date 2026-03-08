@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { defineAgent } from "../agent.js";
 import type { RunConfig } from "../types.js";
 
@@ -33,9 +33,20 @@ const baseAgent = defineAgent({
   model: "anthropic/claude-sonnet-4",
 });
 
+let savedApiKey: string | undefined;
+
 beforeEach(() => {
   constructorArgs = [];
+  savedApiKey = process.env.OPENROUTER_API_KEY;
   delete process.env.OPENROUTER_API_KEY;
+});
+
+afterEach(() => {
+  if (savedApiKey !== undefined) {
+    process.env.OPENROUTER_API_KEY = savedApiKey;
+  } else {
+    delete process.env.OPENROUTER_API_KEY;
+  }
 });
 
 describe("OpenRouter provider", () => {

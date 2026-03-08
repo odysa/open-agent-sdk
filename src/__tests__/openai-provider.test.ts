@@ -10,7 +10,6 @@ import { collect, collectText } from "./mock-provider.js";
 type CreateArgs = Record<string, unknown>;
 let capturedCreateArgs: CreateArgs[] = [];
 let createResponses: AsyncGenerator<any>[] = [];
-let responseIndex = 0;
 
 async function* fakeStream(chunks: any[]): AsyncGenerator<any> {
   for (const chunk of chunks) {
@@ -51,7 +50,7 @@ mock.module("openai", () => {
       completions: {
         create: (args: CreateArgs) => {
           capturedCreateArgs.push(args);
-          return createResponses[responseIndex++];
+          return createResponses.shift();
         },
       },
     };
@@ -74,7 +73,6 @@ function makeConfig(overrides: Partial<RunConfig> = {}): RunConfig {
 beforeEach(() => {
   capturedCreateArgs = [];
   createResponses = [];
-  responseIndex = 0;
 });
 
 describe("OpenAI provider", () => {
@@ -90,8 +88,9 @@ describe("OpenAI provider", () => {
       ]),
     ];
 
-    const provider = await createOpenAIProvider(makeConfig());
-    const chunks = await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createOpenAIProvider(config);
+    const chunks = await collect(provider.run("hi", config));
 
     expect(chunks.map((c) => c.type)).toEqual(["text", "text", "done"]);
     const text = chunks
@@ -107,8 +106,9 @@ describe("OpenAI provider", () => {
   test("uses default model gpt-4o", async () => {
     createResponses = [fakeStream([mockOpenAIChunk({ content: "hi", finishReason: "stop" })])];
 
-    const provider = await createOpenAIProvider(makeConfig());
-    await collect(provider.run("hi", makeConfig()));
+    const config = makeConfig();
+    const provider = await createOpenAIProvider(config);
+    await collect(provider.run("hi", config));
 
     expect(capturedCreateArgs[0].model).toBe("gpt-4o");
   });
@@ -281,9 +281,10 @@ describe("OpenAI provider", () => {
       fakeStream([mockOpenAIChunk({ content: "Great!", finishReason: "stop" })]),
     );
 
-    const provider = await createOpenAIProvider(makeConfig());
+    const config = makeConfig();
+    const provider = await createOpenAIProvider(config);
 
-    await collectText(provider.run("hi", makeConfig()));
+    await collectText(provider.run("hi", config));
     await collectText(provider.chat("how are you?"));
 
     // Two API calls should have been made
