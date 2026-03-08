@@ -25,8 +25,7 @@ async function main() {
       systemPrompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
       mcpServers: { tools: mcpServer },
       allowedTools: ["mcp__tools__get_weather"],
-      permissionMode: "bypassPermissions" as const,
-      allowDangerouslySkipPermissions: true,
+      maxTurns: 3,
     },
   });
 
