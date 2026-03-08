@@ -1,6 +1,7 @@
-import type { AgentDef, RunConfig, StreamChunk, ToolDef } from "../types.js";
+import type { AgentDef, RunConfig, StreamChunk } from "../types.js";
 import { handoffToolName, parseHandoff } from "../utils/handoff.js";
 import { importProvider } from "../utils/import-provider.js";
+import { buildToolMap } from "../utils/tool-map.js";
 import { zodToJsonSchema } from "../utils/zod-to-jsonschema.js";
 import type { ProviderBackend } from "./types.js";
 
@@ -29,14 +30,6 @@ function buildTools(agent: AgentDef, agents?: Record<string, AgentDef>) {
   return tools;
 }
 
-function buildToolMap(agent: AgentDef): Map<string, ToolDef> {
-  const map = new Map<string, ToolDef>();
-  for (const t of agent.tools ?? []) {
-    map.set(t.name, t);
-  }
-  return map;
-}
-
 export async function createAnthropicProvider(config: RunConfig): Promise<ProviderBackend> {
   const mod = await importProvider("@anthropic-ai/sdk", "bun add @anthropic-ai/sdk");
   const Anthropic = mod.default ?? mod.Anthropic ?? mod;
@@ -44,19 +37,24 @@ export async function createAnthropicProvider(config: RunConfig): Promise<Provid
 
   const client = new Anthropic({
     apiKey: (opts.apiKey as string) ?? process.env.ANTHROPIC_API_KEY,
-    ...opts,
   });
 
   let activeAgent = config.agent;
   let toolMap = buildToolMap(activeAgent);
+  let tools = buildTools(activeAgent, config.agents);
   const messages: Record<string, unknown>[] = [];
-  const maxTokens = (opts.maxTokens as number) ?? 8096;
+  const maxTokens = (opts.maxTokens as number) ?? 8192;
+
+  function swapAgent(agent: AgentDef) {
+    activeAgent = agent;
+    toolMap = buildToolMap(activeAgent);
+    tools = buildTools(activeAgent, config.agents);
+  }
 
   async function* runStream(signal?: AbortSignal): AsyncGenerator<StreamChunk> {
     const maxTurns = config.maxTurns ?? 100;
 
     for (let turn = 0; turn < maxTurns; turn++) {
-      const tools = buildTools(activeAgent, config.agents);
       const model = activeAgent.model ?? "claude-sonnet-4-20250514";
 
       const stream = await client.messages.create({
@@ -114,12 +112,8 @@ export async function createAnthropicProvider(config: RunConfig): Promise<Provid
                 input: currentToolUse.jsonInput ? JSON.parse(currentToolUse.jsonInput) : {},
               });
               currentToolUse = null;
-            } else if (fullText) {
-              // Only add text block if we haven't added one yet for this content block
-              const lastBlock = contentBlocks[contentBlocks.length - 1];
-              if (!lastBlock || lastBlock.type !== "text") {
-                contentBlocks.push({ type: "text", text: fullText });
-              }
+            } else {
+              contentBlocks.push({ type: "text", text: fullText });
             }
             break;
           }
@@ -138,13 +132,11 @@ export async function createAnthropicProvider(config: RunConfig): Promise<Provid
         }
       }
 
-      // Ensure text block is in contentBlocks
-      if (fullText && !contentBlocks.some((b) => b.type === "text")) {
-        contentBlocks.unshift({ type: "text", text: fullText });
-      }
-
       // Add assistant message
-      messages.push({ role: "assistant", content: contentBlocks });
+      messages.push({
+        role: "assistant",
+        content: contentBlocks.length > 0 ? contentBlocks : fullText,
+      });
 
       if (stopReason !== "tool_use") {
         yield { type: "done", text: fullText, usage };
@@ -181,8 +173,7 @@ export async function createAnthropicProvider(config: RunConfig): Promise<Provid
           }
 
           yield { type: "handoff", fromAgent: activeAgent.name, toAgent: handoffTarget };
-          activeAgent = targetAgent;
-          toolMap = buildToolMap(activeAgent);
+          swapAgent(targetAgent);
           toolResults.push({
             type: "tool_result",
             tool_use_id: block.id,

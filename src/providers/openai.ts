@@ -1,6 +1,7 @@
-import type { AgentDef, RunConfig, StreamChunk, ToolDef } from "../types.js";
+import type { AgentDef, RunConfig, StreamChunk } from "../types.js";
 import { handoffToolName, parseHandoff } from "../utils/handoff.js";
 import { importProvider } from "../utils/import-provider.js";
+import { buildToolMap } from "../utils/tool-map.js";
 import { zodToJsonSchema } from "../utils/zod-to-jsonschema.js";
 import type { ProviderBackend } from "./types.js";
 
@@ -42,14 +43,6 @@ function buildTools(agent: AgentDef, agents?: Record<string, AgentDef>) {
   return tools;
 }
 
-function buildToolMap(agent: AgentDef): Map<string, ToolDef> {
-  const map = new Map<string, ToolDef>();
-  for (const t of agent.tools ?? []) {
-    map.set(t.name, t);
-  }
-  return map;
-}
-
 export async function createOpenAICompatibleProvider(
   config: RunConfig,
   options: OpenAICompatibleOptions,
@@ -60,23 +53,29 @@ export async function createOpenAICompatibleProvider(
     apiKey: options.apiKey,
     baseURL: options.baseURL,
     defaultHeaders: options.defaultHeaders,
-    ...options.providerOptions,
   });
 
   let activeAgent = config.agent;
   let toolMap = buildToolMap(activeAgent);
-  const messages: Record<string, unknown>[] = [];
+  let tools = buildTools(activeAgent, config.agents);
+  const messages: Record<string, unknown>[] = [{ role: "system", content: activeAgent.prompt }];
+
+  function swapAgent(agent: AgentDef) {
+    activeAgent = agent;
+    toolMap = buildToolMap(activeAgent);
+    tools = buildTools(activeAgent, config.agents);
+    messages[0] = { role: "system", content: activeAgent.prompt };
+  }
 
   async function* runStream(signal?: AbortSignal): AsyncGenerator<StreamChunk> {
     const maxTurns = config.maxTurns ?? 100;
 
     for (let turn = 0; turn < maxTurns; turn++) {
-      const tools = buildTools(activeAgent, config.agents);
       const model = activeAgent.model ?? "gpt-4o";
 
       const stream = await client.chat.completions.create({
         model,
-        messages: [{ role: "system", content: activeAgent.prompt }, ...messages],
+        messages,
         ...(tools.length > 0 ? { tools } : {}),
         stream: true,
         signal,
@@ -145,7 +144,9 @@ export async function createOpenAICompatibleProvider(
         let args: Record<string, unknown> = {};
         try {
           args = JSON.parse(tc.arguments || "{}");
-        } catch {}
+        } catch {
+          yield { type: "error", error: `Failed to parse tool arguments for ${tc.name}` };
+        }
 
         yield { type: "tool_call", toolName: tc.name, toolArgs: args, toolCallId: tc.id };
 
@@ -163,8 +164,7 @@ export async function createOpenAICompatibleProvider(
           }
 
           yield { type: "handoff", fromAgent: activeAgent.name, toAgent: handoffTarget };
-          activeAgent = targetAgent;
-          toolMap = buildToolMap(activeAgent);
+          swapAgent(targetAgent);
           messages.push({
             role: "tool",
             tool_call_id: tc.id,
