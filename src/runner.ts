@@ -35,7 +35,10 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
   }
 }
 
-/** Start a run — returns a stream, chat handle, and close function */
+/**
+ * Start a run — returns a stream, chat handle, and close function.
+ * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk/claude-agent-sdk` instead.
+ */
 export async function run(prompt: string, config: RunConfig): Promise<AgentRun> {
   const provider = await createProvider(config);
   const middleware = config.middleware;
@@ -57,7 +60,10 @@ export async function run(prompt: string, config: RunConfig): Promise<AgentRun> 
   };
 }
 
-/** Convenience: run to completion and return collected text */
+/**
+ * Convenience: run to completion and return collected text.
+ * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk/claude-agent-sdk` instead.
+ */
 export async function runToCompletion(prompt: string, config: RunConfig): Promise<string>;
 /** Convenience: run to completion and parse/validate against a Zod schema */
 export async function runToCompletion<T extends z.ZodType>(

@@ -42,13 +42,55 @@ npm install @moonshot-ai/kimi-agent-sdk
 
 :::
 
-## Quick Start
+## Quick Start (Claude)
+
+If you're using Claude, `one-agent-sdk/claude-agent-sdk` is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`:
+
+```typescript
+import { z } from "zod";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+
+const weatherTool = tool(
+  "get_weather",
+  "Get the current weather for a city",
+  { city: z.string().describe("City name") },
+  async ({ city }) => ({
+    content: [{ type: "text" as const, text: JSON.stringify({ city, temperature: 72, condition: "sunny" }) }],
+  }),
+);
+
+const mcpServer = createSdkMcpServer({
+  name: "tools",
+  version: "1.0.0",
+  tools: [weatherTool],
+});
+
+const conversation = query({
+  prompt: "What's the weather in San Francisco?",
+  options: {
+    systemPrompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
+    mcpServers: { tools: mcpServer },
+    allowedTools: ["mcp__tools__get_weather"],
+  },
+});
+
+for await (const msg of conversation) {
+  if (msg.type === "assistant" && msg.message?.content) {
+    for (const block of msg.message.content) {
+      if ("text" in block && block.text) process.stdout.write(block.text);
+    }
+  }
+}
+```
+
+## Quick Start (Provider-Agnostic)
+
+> **Note:** The provider-agnostic API is deprecated and will be removed in v0.2. For Claude, prefer the interface above.
 
 ```typescript
 import { z } from "zod";
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
-// Define a tool
 const weatherTool = defineTool({
   name: "get_weather",
   description: "Get the current weather for a city",
@@ -60,7 +102,6 @@ const weatherTool = defineTool({
   },
 });
 
-// Define an agent
 const agent = defineAgent({
   name: "assistant",
   description: "A helpful assistant",
@@ -68,9 +109,8 @@ const agent = defineAgent({
   tools: [weatherTool],
 });
 
-// Run — swap provider by changing this value
 const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "claude-code", // "claude-code" | "codex" | "kimi-cli"
+  provider: "claude-code",
   agent,
 });
 

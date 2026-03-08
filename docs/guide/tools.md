@@ -1,8 +1,31 @@
 # Tools
 
-Tools let agents interact with external systems. Each tool has a name, description, a Zod schema for its parameters, and an async handler function.
+Tools let agents interact with external systems.
 
-## Defining a Tool
+## Claude Agent SDK (Recommended)
+
+Using `one-agent-sdk/claude-agent-sdk`, tools follow the Anthropic Agent SDK interface:
+
+```typescript
+import { z } from "zod";
+import { tool } from "one-agent-sdk/claude-agent-sdk";
+
+const searchTool = tool(
+  "search",
+  "Search the web for information",
+  {
+    query: z.string().describe("Search query"),
+    maxResults: z.number().optional().describe("Max results to return"),
+  },
+  async ({ query, maxResults }) => ({
+    content: [{ type: "text" as const, text: JSON.stringify(await performSearch(query, maxResults)) }],
+  }),
+);
+```
+
+## Provider-Agnostic (Deprecated)
+
+> **Note:** `defineTool` is deprecated and will be removed in v0.2.
 
 ```typescript
 import { z } from "zod";

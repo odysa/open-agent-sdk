@@ -22,12 +22,10 @@
 </div>
 
 ```typescript
-import { defineAgent, defineTool, run } from "one-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
 
-const { stream } = await run("What's the weather?", {
-  provider: "claude-code",  // swap to "codex" or "kimi-cli" — same code, different backend
-  agent,
-});
+// 100% compatible with @anthropic-ai/claude-agent-sdk — same API, zero lock-in
+const conversation = query({ prompt: "What's the weather?" });
 ```
 
 <br />
@@ -87,13 +85,55 @@ npm install @openai/codex-sdk
 npm install @moonshot-ai/kimi-agent-sdk
 ```
 
-### Quick Start
+### Quick Start (Claude)
+
+Drop-in replacement for `@anthropic-ai/claude-agent-sdk` — same API, no changes needed:
+
+```typescript
+import { z } from "zod";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+
+const weatherTool = tool(
+  "get_weather",
+  "Get the current weather for a city",
+  { city: z.string().describe("City name") },
+  async ({ city }) => ({
+    content: [{ type: "text" as const, text: JSON.stringify({ city, temperature: 72, condition: "sunny" }) }],
+  }),
+);
+
+const mcpServer = createSdkMcpServer({
+  name: "tools",
+  version: "1.0.0",
+  tools: [weatherTool],
+});
+
+const conversation = query({
+  prompt: "What's the weather in San Francisco?",
+  options: {
+    systemPrompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
+    mcpServers: { tools: mcpServer },
+    allowedTools: ["mcp__tools__get_weather"],
+  },
+});
+
+for await (const msg of conversation) {
+  if (msg.type === "assistant" && msg.message?.content) {
+    for (const block of msg.message.content) {
+      if ("text" in block && block.text) process.stdout.write(block.text);
+    }
+  }
+}
+```
+
+### Quick Start (Provider-Agnostic)
+
+Use the unified interface to swap between Claude, Codex, and Kimi with one line:
 
 ```typescript
 import { z } from "zod";
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
-// Define a tool with Zod — type-safe across all providers
 const weatherTool = defineTool({
   name: "get_weather",
   description: "Get the current weather for a city",
@@ -105,7 +145,6 @@ const weatherTool = defineTool({
   },
 });
 
-// Define an agent
 const agent = defineAgent({
   name: "assistant",
   description: "A helpful assistant",
@@ -113,7 +152,6 @@ const agent = defineAgent({
   tools: [weatherTool],
 });
 
-// Run it
 const { stream } = await run("What's the weather in San Francisco?", {
   provider: "claude-code",
   agent,
@@ -126,6 +164,9 @@ for await (const chunk of stream) {
 
 > [!TIP]
 > To switch providers, just change `provider: "claude-code"` to `"codex"` or `"kimi-cli"`. Everything else stays the same.
+
+> [!NOTE]
+> The provider-agnostic API (`defineAgent`, `defineTool`, `run`, `runToCompletion`) is deprecated and will be removed in v0.2. For Claude users, prefer `one-agent-sdk/claude-agent-sdk`.
 
 <br />
 
@@ -296,6 +337,16 @@ All providers emit the same `StreamChunk` discriminated union:
 
 ## API Reference
 
+### Claude Agent SDK (Recommended for Claude)
+
+```typescript
+import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+```
+
+This is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. All exports are 100% API-compatible — see the [Anthropic Agent SDK docs](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) for full API reference.
+
+### Provider-Agnostic API (Deprecated — will be removed in v0.2)
+
 | Function | Description |
 | :------- | :---------- |
 | `run(prompt, config)` | Start a streaming agent run. Returns `{ stream, chat, close }` |
@@ -324,7 +375,7 @@ The [`examples/`](./examples) directory contains runnable demos:
 | :------ | :---------- |
 | [`hello.ts`](./examples/hello.ts) | Minimal agent, no tools |
 | [`multi-agent.ts`](./examples/multi-agent.ts) | Two agents handing off to each other |
-| [`claude.ts`](./examples/claude.ts) | Claude-specific example |
+| [`claude.ts`](./examples/claude.ts) | Claude via `one-agent-sdk/claude-agent-sdk` (drop-in replacement) |
 | [`codex.ts`](./examples/codex.ts) | Codex-specific example |
 | [`kimi.ts`](./examples/kimi.ts) | Kimi-specific example |
 
