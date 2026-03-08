@@ -6,7 +6,7 @@ Tools let agents interact with external systems. Define tools using the same `to
 
 ```typescript
 import { z } from "zod";
-import { tool } from "one-agent-sdk/claude-agent-sdk";
+import { tool } from "one-agent-sdk";
 
 const searchTool = tool(
   "search",
@@ -26,7 +26,7 @@ const searchTool = tool(
 Tools are registered via `createSdkMcpServer()` and passed to `query()`:
 
 ```typescript
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 
 const mcpServer = createSdkMcpServer({
   name: "tools",

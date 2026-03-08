@@ -1,6 +1,6 @@
 # Runner Spec (Legacy)
 
-> **Deprecated.** `run()` and `runToCompletion()` will be removed in v0.2. Use `query()` from `one-agent-sdk/claude-agent-sdk` instead (see [compat.md](compat.md)).
+> **Deprecated.** `run()` and `runToCompletion()` will be removed in v0.2. Use `query()` from `one-agent-sdk` instead (see [compat.md](compat.md)).
 
 Defines `run()`, `runToCompletion()`, and provider resolution.
 

@@ -26,10 +26,6 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./claude-agent-sdk": {
-      "import": "./dist/compat/claude-agent-sdk.js",
-      "types": "./dist/compat/claude-agent-sdk.d.ts"
     }
   },
   "files": [

@@ -6,7 +6,7 @@ import { extractJson } from "./utils/extract-json.js";
 
 /**
  * Start a run — returns a stream, chat handle, and close function.
- * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk/claude-agent-sdk` instead.
+ * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk` instead.
  */
 export async function run(prompt: string, config: RunConfig): Promise<AgentRun> {
   const provider = await createProvider(config);
@@ -31,7 +31,7 @@ export async function run(prompt: string, config: RunConfig): Promise<AgentRun> 
 
 /**
  * Convenience: run to completion and return collected text.
- * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk/claude-agent-sdk` instead.
+ * @deprecated Will be removed in v0.2. Use `query()` from `one-agent-sdk` instead.
  */
 export async function runToCompletion(prompt: string, config: RunConfig): Promise<string>;
 /** Convenience: run to completion and parse/validate against a Zod schema */

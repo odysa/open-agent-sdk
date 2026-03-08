@@ -6,14 +6,14 @@ Drop-in compatibility layer for `@anthropic-ai/claude-agent-sdk` with multi-prov
 
 ## Overview
 
-The `one-agent-sdk/claude-agent-sdk` subpath export is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. Users switch their import path and gain multi-provider support via `options.provider`.
+The `one-agent-sdk` subpath export is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. Users switch their import path and gain multi-provider support via `options.provider`.
 
 ```ts
 // Before
 import { query, tool, createSdkMcpServer } from "@anthropic-ai/claude-agent-sdk";
 
 // After — same API, multiple providers
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 ```
 
 ## Interface

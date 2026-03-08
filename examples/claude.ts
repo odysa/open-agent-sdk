@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { query, tool, createSdkMcpServer } from "../src/compat/claude-agent-sdk.js";
+import { query, tool, createSdkMcpServer } from "../src/index.js";
 
 const weatherTool = tool(
   "get_weather",

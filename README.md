@@ -22,7 +22,7 @@
 </div>
 
 ```typescript
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 
 // Same API as @anthropic-ai/claude-agent-sdk — swap provider with one option
 const conversation = query({
@@ -92,7 +92,7 @@ npm install @moonshot-ai/kimi-agent-sdk
 
 ```typescript
 import { z } from "zod";
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 
 const weatherTool = tool(
   "get_weather",
@@ -139,7 +139,7 @@ for await (const msg of conversation) {
 Same code, different backend — just change `options.provider`:
 
 ```typescript
-import { query } from "one-agent-sdk/claude-agent-sdk";
+import { query } from "one-agent-sdk";
 
 // Use Claude (default)
 const claude = query({ prompt: "Explain this code" });
@@ -159,7 +159,7 @@ Register your own provider backend and use it with `query()`:
 
 ```typescript
 import { registerProvider } from "one-agent-sdk";
-import { query } from "one-agent-sdk/claude-agent-sdk";
+import { query } from "one-agent-sdk";
 
 registerProvider("my-llm", async (config) => ({
   async *run(prompt) {
@@ -204,7 +204,7 @@ graph LR
 ## API Reference
 
 ```typescript
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 ```
 
 100% API-compatible with `@anthropic-ai/claude-agent-sdk`. All exports are identical — see the [Anthropic Agent SDK docs](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) for the full reference.
@@ -243,7 +243,7 @@ npx tsx examples/hello.ts
 
 ## Legacy API (Deprecated)
 
-The following functions are exported from `one-agent-sdk` and will be removed in v0.2. Migrate to `one-agent-sdk/claude-agent-sdk` instead.
+The following functions are exported from `one-agent-sdk` and will be removed in v0.2. Migrate to `one-agent-sdk` instead.
 
 | Function | Replacement |
 | :------- | :---------- |

@@ -44,11 +44,11 @@ npm install @moonshot-ai/kimi-agent-sdk
 
 ## Quick Start
 
-`one-agent-sdk/claude-agent-sdk` is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. Same API, multiple providers:
+`one-agent-sdk` is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. Same API, multiple providers:
 
 ```typescript
 import { z } from "zod";
-import { query, tool, createSdkMcpServer } from "one-agent-sdk/claude-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 
 // Define a tool (same as @anthropic-ai/claude-agent-sdk)
 const weatherTool = tool(
