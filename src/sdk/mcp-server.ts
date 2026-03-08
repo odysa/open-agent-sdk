@@ -10,6 +10,11 @@ export type MockMcpServerConfig = McpSdkServerConfigWithInstance & {
   [MOCK_MCP_SERVER]: CreateSdkMcpServerOptions;
 };
 
+/** Type guard for mock MCP server configs created by createSdkMcpServer(). */
+export function isMockMcpServer(config: unknown): config is MockMcpServerConfig {
+  return config != null && typeof config === "object" && MOCK_MCP_SERVER in config;
+}
+
 /**
  * Create an MCP server configuration for use with query().
  *

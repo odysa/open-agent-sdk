@@ -14,10 +14,13 @@ export const INSTALL_HINT = "bun add @anthropic-ai/claude-agent-sdk";
 
 let sdkPromise: Promise<any> | null = null;
 
-/** Cached dynamic import of the Anthropic SDK. */
+/** Cached dynamic import of the Anthropic SDK. Clears cache on failure so retries work. */
 export function sdk(): Promise<any> {
   if (!sdkPromise) {
-    sdkPromise = importProvider(SDK_PKG, INSTALL_HINT);
+    sdkPromise = importProvider(SDK_PKG, INSTALL_HINT).catch((err) => {
+      sdkPromise = null;
+      throw err;
+    });
   }
   return sdkPromise;
 }

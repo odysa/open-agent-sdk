@@ -2,7 +2,7 @@ import type { AgentDef, Provider, RunConfig, ToolDef } from "../types.js";
 import { createProvider } from "../utils/create-provider.js";
 import { adaptStream } from "./adapt-stream.js";
 import { sdk } from "./delegates.js";
-import { MOCK_MCP_SERVER, type MockMcpServerConfig } from "./mcp-server.js";
+import { isMockMcpServer, MOCK_MCP_SERVER } from "./mcp-server.js";
 import type { Options, SDKMessage, SDKUserMessage } from "./types.js";
 
 /**
@@ -12,8 +12,8 @@ import type { Options, SDKMessage, SDKUserMessage } from "./types.js";
 function extractToolsFromMcpServers(mcpServers: Record<string, any>): ToolDef[] {
   const tools: ToolDef[] = [];
   for (const config of Object.values(mcpServers)) {
-    if (config && typeof config === "object" && MOCK_MCP_SERVER in config) {
-      const mockConfig = (config as MockMcpServerConfig)[MOCK_MCP_SERVER];
+    if (isMockMcpServer(config)) {
+      const mockConfig = config[MOCK_MCP_SERVER];
       for (const t of mockConfig.tools ?? []) {
         tools.push({
           name: t.name,
@@ -62,7 +62,7 @@ async function materializeMcpServers(
 ): Promise<Record<string, any>> {
   const result: Record<string, any> = {};
   for (const [key, config] of Object.entries(servers)) {
-    if (config && typeof config === "object" && MOCK_MCP_SERVER in config) {
+    if (isMockMcpServer(config)) {
       result[key] = sdk.createSdkMcpServer(config[MOCK_MCP_SERVER]);
     } else {
       result[key] = config;
@@ -100,13 +100,17 @@ export function query(input: {
     })();
   }
 
+  if (typeof prompt !== "string") {
+    throw new Error(
+      "AsyncIterable<SDKUserMessage> prompt is only supported with the claude-code provider",
+    );
+  }
+
   return (async function* () {
     const config = toRunConfig(provider, options as Record<string, any>);
     const backend = await createProvider(config);
     try {
-      yield* adaptStream(
-        backend.run(typeof prompt === "string" ? prompt : "", config),
-      ) as AsyncGenerator<SDKMessage>;
+      yield* adaptStream(backend.run(prompt, config)) as AsyncGenerator<SDKMessage>;
     } finally {
       await backend.close();
     }
