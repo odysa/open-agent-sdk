@@ -26,9 +26,21 @@ export async function createProvider(config: RunConfig): Promise<ProviderBackend
       const { createCopilotProvider } = await import("../providers/copilot.js");
       return createCopilotProvider(config);
     }
+    case "openai": {
+      const { createOpenAIProvider } = await import("../providers/openai.js");
+      return createOpenAIProvider(config);
+    }
+    case "anthropic": {
+      const { createAnthropicProvider } = await import("../providers/anthropic.js");
+      return createAnthropicProvider(config);
+    }
+    case "openrouter": {
+      const { createOpenRouterProvider } = await import("../providers/openrouter.js");
+      return createOpenRouterProvider(config);
+    }
     default:
       throw new Error(
-        `Unknown provider: ${config.provider}. Use: claude-code, codex, copilot, kimi-cli, or register a custom provider with registerProvider()`,
+        `Unknown provider: ${config.provider}. Use: claude-code, codex, copilot, kimi-cli, openai, anthropic, openrouter, or register a custom provider with registerProvider()`,
       );
   }
 }

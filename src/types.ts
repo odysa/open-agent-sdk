@@ -46,7 +46,14 @@ export type StreamChunk =
     };
 
 /** Built-in provider backends */
-export type BuiltinProvider = "claude-code" | "codex" | "copilot" | "kimi-cli";
+export type BuiltinProvider =
+  | "claude-code"
+  | "codex"
+  | "copilot"
+  | "kimi-cli"
+  | "openai"
+  | "anthropic"
+  | "openrouter";
 
 /** Supported provider backends (built-in + registered) */
 export type Provider = BuiltinProvider | (string & {});

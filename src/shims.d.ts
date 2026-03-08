@@ -62,3 +62,19 @@ declare module "@github/copilot-sdk" {
   function approveAll(request: any): any;
   export { CopilotClient, CopilotSession, defineTool, approveAll };
 }
+
+declare module "openai" {
+  class OpenAI {
+    constructor(options?: Record<string, unknown>);
+    chat: { completions: { create(options: Record<string, unknown>): any } };
+  }
+  export default OpenAI;
+}
+
+declare module "@anthropic-ai/sdk" {
+  class Anthropic {
+    constructor(options?: Record<string, unknown>);
+    messages: { create(options: Record<string, unknown>): any };
+  }
+  export default Anthropic;
+}
