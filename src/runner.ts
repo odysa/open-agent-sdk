@@ -20,13 +20,17 @@ async function createProvider(config: RunConfig): Promise<ProviderBackend> {
       const { createCodexProvider } = await import("./providers/codex.js");
       return createCodexProvider(config);
     }
+    case "gemini-cli": {
+      const { createGeminiProvider } = await import("./providers/gemini.js");
+      return createGeminiProvider(config);
+    }
     case "kimi-cli": {
       const { createKimiProvider } = await import("./providers/kimi.js");
       return createKimiProvider(config);
     }
     default:
       throw new Error(
-        `Unknown provider: ${config.provider}. Use: claude-code, codex, kimi-cli, or register a custom provider with registerProvider()`,
+        `Unknown provider: ${config.provider}. Use: claude-code, codex, gemini-cli, kimi-cli, or register a custom provider with registerProvider()`,
       );
   }
 }

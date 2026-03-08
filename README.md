@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
 
-**One SDK, every agent.** Embed Claude Code, Codex, and Kimi into your TypeScript app — no API keys required.
+**One SDK, every agent.** Embed Claude Code, Codex, Gemini CLI, and Kimi into your TypeScript app — no API keys required.
 
 <br />
 
@@ -25,7 +25,7 @@
 import { defineAgent, defineTool, run } from "one-agent-sdk";
 
 const { stream } = await run("What's the weather?", {
-  provider: "claude-code",  // swap to "codex" or "kimi-cli" — same code, different backend
+  provider: "claude-code",  // swap to "codex", "gemini-cli", or "kimi-cli" — same code, different backend
   agent,
 });
 ```
@@ -58,6 +58,7 @@ Everything else stays the same: streaming, tools, handoffs, middleware — all o
 | :------- | :------ | :------------ |
 | `claude-code` | [`@anthropic-ai/claude-agent-sdk`](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) | Claude Code |
 | `codex` | [`@openai/codex-sdk`](https://www.npmjs.com/package/@openai/codex-sdk) | ChatGPT Codex |
+| `gemini-cli` | [`@google/gemini-cli-core`](https://www.npmjs.com/package/@google/gemini-cli-core) | Gemini CLI |
 | `kimi-cli` | [`@moonshot-ai/kimi-agent-sdk`](https://www.npmjs.com/package/@moonshot-ai/kimi-agent-sdk) | Kimi-CLI |
 
 All providers are **optional peer dependencies** — install only what you need. You can also [register custom providers](#custom-providers).
@@ -83,6 +84,7 @@ Then install your provider:
 # Pick one (or more)
 npm install @anthropic-ai/claude-agent-sdk
 npm install @openai/codex-sdk
+npm install @google/gemini-cli-core
 npm install @moonshot-ai/kimi-agent-sdk
 ```
 
@@ -124,7 +126,7 @@ for await (const chunk of stream) {
 ```
 
 > [!TIP]
-> To switch providers, just change `provider: "claude-code"` to `"codex"` or `"kimi-cli"`. Everything else stays the same.
+> To switch providers, just change `provider: "claude-code"` to `"codex"`, `"gemini-cli"`, or `"kimi-cli"`. Everything else stays the same.
 
 <br />
 
@@ -258,10 +260,12 @@ graph LR
     A["run(prompt, config)"] --> B{Provider Registry}
     B --> C[Claude Code]
     B --> D[Codex]
+    B --> E2[Gemini CLI]
     B --> E[Kimi]
     B --> F[Custom]
     C --> G[Middleware Pipeline]
     D --> G
+    E2 --> G
     E --> G
     F --> G
     G --> H["{ stream, chat, close }"]
@@ -271,6 +275,7 @@ Each provider adapts its native SDK to a unified `StreamChunk` interface:
 
 - **Claude Code** — wraps the Claude Agent SDK. Tools are exposed via an in-process MCP server.
 - **Codex** — wraps the Codex SDK. Zod schemas are converted to JSON Schema automatically.
+- **Gemini CLI** — wraps `@google/gemini-cli-core`. Converts tools to Gemini function declarations and manages the tool execution loop.
 - **Kimi** — wraps the Kimi Agent SDK. Uses `createSession`/`createExternalTool`.
 
 > [!NOTE]
@@ -325,6 +330,7 @@ The [`examples/`](./examples) directory contains runnable demos:
 | [`multi-agent.ts`](./examples/multi-agent.ts) | Two agents handing off to each other |
 | [`claude.ts`](./examples/claude.ts) | Claude-specific example |
 | [`codex.ts`](./examples/codex.ts) | Codex-specific example |
+| [`gemini.ts`](./examples/gemini.ts) | Gemini CLI-specific example |
 | [`kimi.ts`](./examples/kimi.ts) | Kimi-specific example |
 
 ```bash
