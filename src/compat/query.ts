@@ -1,29 +1,9 @@
-import { getProvider } from "../registry.js";
-import type { AgentDef, RunConfig } from "../types.js";
+import type { AgentDef, Provider, RunConfig } from "../types.js";
+import { createProvider } from "../utils/create-provider.js";
 import { importProvider } from "../utils/import-provider.js";
 import { adaptStream } from "./adapt-stream.js";
 
-async function createBackend(provider: string, config: RunConfig) {
-  const factory = getProvider(provider);
-  if (factory) return factory(config);
-
-  switch (provider) {
-    case "codex": {
-      const { createCodexProvider } = await import("../providers/codex.js");
-      return createCodexProvider(config);
-    }
-    case "kimi-cli": {
-      const { createKimiProvider } = await import("../providers/kimi.js");
-      return createKimiProvider(config);
-    }
-    default:
-      throw new Error(
-        `Unknown provider: ${provider}. Use: claude-code, codex, kimi-cli, or register a custom provider.`,
-      );
-  }
-}
-
-function toRunConfig(provider: string, options: Record<string, any>): RunConfig {
+function toRunConfig(provider: Provider, options: Record<string, any>): RunConfig {
   const agent: AgentDef = {
     name: options.agentName ?? "default",
     description: options.agentDescription ?? "Default agent",
@@ -57,22 +37,21 @@ export function query(input: {
   options?: Record<string, any>;
 }): AsyncIterable<any> {
   const { prompt, options = {} } = input;
-  const provider = (options.provider as string) ?? "claude-code";
+  const provider: Provider = (options.provider as string) ?? "claude-code";
 
   if (provider === "claude-code") {
-    const { provider: _, ...cleanOptions } = options;
     return (async function* () {
       const sdk = await importProvider<{ query: (opts: any) => AsyncIterable<any> }>(
         "@anthropic-ai/claude-agent-sdk",
         "bun add @anthropic-ai/claude-agent-sdk",
       );
-      yield* sdk.query({ prompt, options: cleanOptions });
+      yield* sdk.query({ prompt, options });
     })();
   }
 
   return (async function* () {
     const config = toRunConfig(provider, options);
-    const backend = await createBackend(provider, config);
+    const backend = await createProvider(config);
     try {
       yield* adaptStream(backend.run(prompt, config));
     } finally {

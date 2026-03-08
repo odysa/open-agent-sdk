@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { adaptStream } from "../compat/adapt-stream.js";
 import { query } from "../compat/query.js";
 import { registerProvider } from "../registry.js";
@@ -19,22 +19,28 @@ async function* fakeStream(): AsyncGenerator<StreamChunk> {
   yield { type: "done", text: "hello world" };
 }
 
+async function collectMessages() {
+  const msgs: any[] = [];
+  for await (const msg of adaptStream(fakeStream())) {
+    msgs.push(msg);
+  }
+  return msgs;
+}
+
 describe("adaptStream()", () => {
-  test("emits init message first", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  let msgs: any[];
+
+  beforeAll(async () => {
+    msgs = await collectMessages();
+  });
+
+  test("emits init message first", () => {
     expect(msgs[0].type).toBe("system");
     expect(msgs[0].subtype).toBe("init");
     expect(msgs[0].session_id).toMatch(/^session_/);
   });
 
-  test("maps text chunks to assistant messages", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  test("maps text chunks to assistant messages", () => {
     const textMsgs = msgs.filter(
       (m) => m.type === "assistant" && m.message?.content?.[0]?.type === "text",
     );
@@ -43,11 +49,7 @@ describe("adaptStream()", () => {
     expect(textMsgs[1].message.content[0].text).toBe("world");
   });
 
-  test("maps tool_call to assistant tool_use message", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  test("maps tool_call to assistant tool_use message", () => {
     const toolMsg = msgs.find((m) => m.message?.content?.[0]?.type === "tool_use");
     expect(toolMsg).toBeDefined();
     expect(toolMsg.message.content[0].name).toBe("get_weather");
@@ -55,32 +57,20 @@ describe("adaptStream()", () => {
     expect(toolMsg.message.content[0].id).toBe("call_1");
   });
 
-  test("maps tool_result to result message", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  test("maps tool_result to result message", () => {
     const resultMsg = msgs.find((m) => m.type === "result" && m.tool_use_id);
     expect(resultMsg).toBeDefined();
     expect(resultMsg.tool_use_id).toBe("call_1");
     expect(resultMsg.content).toBe('{"temp":72}');
   });
 
-  test("maps error to result with error subtype", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  test("maps error to result with error subtype", () => {
     const errorMsg = msgs.find((m) => m.subtype === "error_during_execution");
     expect(errorMsg).toBeDefined();
     expect(errorMsg.error).toBe("oops");
   });
 
-  test("maps done to result with success subtype", async () => {
-    const msgs: any[] = [];
-    for await (const msg of adaptStream(fakeStream())) {
-      msgs.push(msg);
-    }
+  test("maps done to result with success subtype", () => {
     const doneMsg = msgs.find((m) => m.subtype === "success");
     expect(doneMsg).toBeDefined();
     expect(doneMsg.text).toBe("hello world");
