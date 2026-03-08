@@ -37,7 +37,9 @@ describe("adaptStream()", () => {
   test("emits init message first", () => {
     expect(msgs[0].type).toBe("system");
     expect(msgs[0].subtype).toBe("init");
-    expect(msgs[0].session_id).toMatch(/^session_/);
+    expect(msgs[0].session_id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+    );
   });
 
   test("maps text chunks to assistant messages", () => {

@@ -10,7 +10,7 @@ export type AdaptedMessage = { type: string; [key: string]: unknown };
 export async function* adaptStream(
   stream: AsyncGenerator<StreamChunk>,
 ): AsyncGenerator<AdaptedMessage> {
-  const sessionId = `session_${Date.now()}`;
+  const sessionId = crypto.randomUUID();
 
   yield { type: "system", subtype: "init", session_id: sessionId };
 

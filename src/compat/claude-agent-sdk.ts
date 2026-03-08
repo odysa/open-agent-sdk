@@ -26,7 +26,6 @@ export { query } from "./query.js";
 export { tool } from "./tool.js";
 // Types
 export type {
-  AbortError,
   AccountInfo,
   AgentDefinition,
   AgentInfo,
@@ -175,5 +174,6 @@ export type {
   WorktreeRemoveHookInput,
   ZodRawShape,
 } from "./types.js";
+// Value exports (classes that need instanceof support)
 // Constants
-export { EXIT_REASONS, HOOK_EVENTS } from "./types.js";
+export { AbortError, EXIT_REASONS, HOOK_EVENTS } from "./types.js";

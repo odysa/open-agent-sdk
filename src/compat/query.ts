@@ -1,16 +1,44 @@
-import type { AgentDef, Provider, RunConfig } from "../types.js";
+import type { AgentDef, Provider, RunConfig, ToolDef } from "../types.js";
 import { createProvider } from "../utils/create-provider.js";
 import { adaptStream } from "./adapt-stream.js";
 import { sdk } from "./delegates.js";
-import { MOCK_MCP_SERVER } from "./mcp-server.js";
+import { MOCK_MCP_SERVER, type MockMcpServerConfig } from "./mcp-server.js";
 import type { Options, SDKMessage, SDKUserMessage } from "./types.js";
 
-function toRunConfig(provider: Provider, options: Record<string, any>): RunConfig {
+/**
+ * Extract ToolDef[] from mock MCP server configs so non-Claude providers
+ * can use tools defined via createSdkMcpServer() + tool().
+ */
+function extractToolsFromMcpServers(mcpServers: Record<string, any>): ToolDef[] {
+  const tools: ToolDef[] = [];
+  for (const config of Object.values(mcpServers)) {
+    if (config && typeof config === "object" && MOCK_MCP_SERVER in config) {
+      const mockConfig = (config as MockMcpServerConfig)[MOCK_MCP_SERVER];
+      for (const t of mockConfig.tools ?? []) {
+        tools.push({
+          name: t.name,
+          description: t.description,
+          parameters: t.inputSchema as any,
+          handler: async (params: any) => {
+            const result = await t.handler(params, {});
+            return JSON.stringify(result);
+          },
+        });
+      }
+    }
+  }
+  return tools;
+}
+
+export function toRunConfig(provider: Provider, options: Record<string, any>): RunConfig {
+  const mcpTools = options.mcpServers ? extractToolsFromMcpServers(options.mcpServers) : [];
+
   const agent: AgentDef = {
     name: options.agentName ?? "default",
     description: options.agentDescription ?? "Default agent",
     prompt: options.systemPrompt ?? "You are a helpful assistant.",
     model: options.model,
+    tools: mcpTools.length > 0 ? mcpTools : undefined,
   };
 
   return {
