@@ -2,9 +2,9 @@
 
 Defines the `ToolDef` interface, schema conversion, and handler contract.
 
-> The legacy `defineTool()` is deprecated. Use `tool()` from `one-agent-sdk` instead (see [compat.md](compat.md)).
+> The legacy `defineTool()` is deprecated. Use `tool()` from `one-agent-sdk` instead (see [sdk.md](sdk.md)).
 
-**Source:** `src/types.ts`, `src/tool.ts`, `src/utils/zod-to-jsonschema.ts`, `src/compat/tool.ts`
+**Source:** `src/types.ts`, `src/tool.ts`, `src/utils/zod-to-jsonschema.ts`, `src/sdk/tool.ts`
 
 ## Interface
 

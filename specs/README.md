@@ -15,7 +15,7 @@ Internal developer contracts for the Open Agent SDK. Each spec defines the invar
 
 | Spec | Contract | Primary source |
 |------|----------|---------------|
-| [compat.md](compat.md) | `query()`, `tool()`, `createSdkMcpServer()`, drop-in claude-agent-sdk replacement | `src/compat/` |
+| [sdk.md](sdk.md) | `query()`, `tool()`, `createSdkMcpServer()`, drop-in claude-agent-sdk replacement | `src/sdk/` |
 | [streaming.md](streaming.md) | StreamChunk discriminated union, ordering, field contracts | `src/types.ts` |
 | [runner.md](runner.md) | *(deprecated)* `run()`, `runToCompletion()`, provider resolution | `src/runner.ts` |
 | [provider.md](provider.md) | ProviderBackend interface, built-in providers, peer deps | `src/providers/types.ts`, `src/providers/*.ts` |

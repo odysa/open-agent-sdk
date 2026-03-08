@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod";
-import { createSdkMcpServer, MOCK_MCP_SERVER } from "../compat/mcp-server.js";
-import { toRunConfig } from "../compat/query.js";
-import { tool } from "../compat/tool.js";
+import { createSdkMcpServer, MOCK_MCP_SERVER } from "../sdk/mcp-server.js";
+import { toRunConfig } from "../sdk/query.js";
+import { tool } from "../sdk/tool.js";
 
 describe("tool()", () => {
   const weatherTool = tool(

@@ -1,8 +1,8 @@
-# Compat Spec
+# SDK Spec
 
-Drop-in compatibility layer for `@anthropic-ai/claude-agent-sdk` with multi-provider support.
+Drop-in replacement for `@anthropic-ai/claude-agent-sdk` with multi-provider support.
 
-**Source:** `src/compat/claude-agent-sdk.ts` (barrel), `src/compat/query.ts`, `src/compat/tool.ts`, `src/compat/mcp-server.ts`, `src/compat/delegates.ts`, `src/compat/adapt-stream.ts`, `src/compat/types.ts`
+**Source:** `src/sdk/claude-agent-sdk.ts` (barrel), `src/sdk/query.ts`, `src/sdk/tool.ts`, `src/sdk/mcp-server.ts`, `src/sdk/delegates.ts`, `src/sdk/adapt-stream.ts`, `src/sdk/types.ts`
 
 ## Overview
 

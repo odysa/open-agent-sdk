@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { adaptStream } from "../compat/adapt-stream.js";
-import { query } from "../compat/query.js";
 import { registerProvider } from "../registry.js";
+import { adaptStream } from "../sdk/adapt-stream.js";
+import { query } from "../sdk/query.js";
 import type { StreamChunk } from "../types.js";
 
 async function* fakeStream(): AsyncGenerator<StreamChunk> {

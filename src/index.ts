@@ -12,7 +12,7 @@
 
 // ── Anthropic-compatible API (primary) ──────────────────────────────────────
 
-export * from "./compat/claude-agent-sdk.js";
+export * from "./sdk/claude-agent-sdk.js";
 
 // ── Legacy API (deprecated — will be removed in v0.2) ───────────────────────
 
