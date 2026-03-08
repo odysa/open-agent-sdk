@@ -50,6 +50,14 @@ All three are optional peer dependencies with ambient type declarations in `src/
 
 Agents declare `handoffs: string[]` referencing agent names. The runner's `agents` map provides the full definitions. OpenAI/Kimi providers implement handoffs as synthetic `transfer_to_{name}` tools that swap the active agent. Claude provider delegates to the SDK's built-in agent support.
 
+## Specs (`specs/`)
+
+This project is spec-driven. Specs define internal developer contracts — the invariants, behaviors, and edge cases each subsystem must uphold. If a spec and implementation diverge, update the implementation.
+
+Before modifying a subsystem, read its spec. When adding new behavior, update the relevant spec first.
+
+See `specs/README.md` for the full index.
+
 ## Conventions
 
 - ESM-only (`"type": "module"`), all imports use `.js` extensions
