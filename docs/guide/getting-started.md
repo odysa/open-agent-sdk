@@ -44,49 +44,68 @@ npm install @moonshot-ai/kimi-agent-sdk
 
 ## Quick Start
 
+`one-agent-sdk` is a drop-in replacement for `@anthropic-ai/claude-agent-sdk`. Same API, multiple providers:
+
 ```typescript
 import { z } from "zod";
-import { defineAgent, defineTool, run } from "one-agent-sdk";
+import { query, tool, createSdkMcpServer } from "one-agent-sdk";
 
-// Define a tool
-const weatherTool = defineTool({
-  name: "get_weather",
-  description: "Get the current weather for a city",
-  parameters: z.object({
-    city: z.string().describe("City name"),
+// Define a tool (same as @anthropic-ai/claude-agent-sdk)
+const weatherTool = tool(
+  "get_weather",
+  "Get the current weather for a city",
+  { city: z.string().describe("City name") },
+  async ({ city }) => ({
+    content: [{ type: "text" as const, text: JSON.stringify({ city, temperature: 72, condition: "sunny" }) }],
   }),
-  handler: async ({ city }) => {
-    return JSON.stringify({ city, temperature: 72, condition: "sunny" });
-  },
-});
+);
 
-// Define an agent
-const agent = defineAgent({
-  name: "assistant",
-  description: "A helpful assistant",
-  prompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
+const mcpServer = createSdkMcpServer({
+  name: "tools",
+  version: "1.0.0",
   tools: [weatherTool],
 });
 
-// Run — swap provider by changing this value
-const { stream } = await run("What's the weather in San Francisco?", {
-  provider: "claude-code", // "claude-code" | "codex" | "kimi-cli"
-  agent,
+// query() defaults to claude-code — pass options.provider to switch
+const conversation = query({
+  prompt: "What's the weather in San Francisco?",
+  options: {
+    systemPrompt: "You are a helpful assistant. Use the weather tool when asked about weather.",
+    mcpServers: { tools: mcpServer },
+    allowedTools: ["mcp__tools__get_weather"],
+  },
 });
 
-for await (const chunk of stream) {
-  if (chunk.type === "text") {
-    process.stdout.write(chunk.text);
+for await (const msg of conversation) {
+  if (msg.type === "assistant" && msg.message?.content) {
+    for (const block of msg.message.content) {
+      if ("text" in block && block.text) process.stdout.write(block.text);
+    }
   }
 }
 ```
 
+### Switching Providers
+
+Pass `options.provider` to route to a different backend:
+
+```typescript
+// Use Codex instead of Claude
+const conversation = query({
+  prompt: "What's the weather in San Francisco?",
+  options: {
+    provider: "codex", // "claude-code" (default) | "codex" | "kimi-cli"
+    systemPrompt: "You are a helpful assistant.",
+  },
+});
+```
+
+The output stream emits the same `SDKMessage` format regardless of backend.
+
 ## What's Next?
 
-- Learn about [Agents](/guide/agents) and how to configure them
-- See how to define [Tools](/guide/tools) with type-safe parameters
+- Learn about [Tools](/guide/tools) with type-safe parameters
 - Understand the [Streaming](/guide/streaming) interface
-- Build [Multi-Agent Handoffs](/guide/handoffs)
 - Compare [Providers](/guide/providers) and register custom ones
 - Add [Middleware](/guide/middleware) to transform streams
 - Manage [Sessions](/guide/sessions) for multi-turn conversations

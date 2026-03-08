@@ -1,8 +1,10 @@
-# Runner Spec
+# Runner Spec (Legacy)
+
+> **Deprecated.** `run()` and `runToCompletion()` will be removed in v0.2. Use `query()` from `one-agent-sdk` instead (see [sdk.md](sdk.md)).
 
 Defines `run()`, `runToCompletion()`, and provider resolution.
 
-**Source:** `src/runner.ts`
+**Source:** `src/runner.ts`, `src/utils/create-provider.ts`
 
 ## Interface
 
@@ -37,6 +39,8 @@ interface RunConfig {
 ## Behavior
 
 ### Provider resolution (`createProvider`)
+
+Provider resolution is shared between the legacy `run()` API and the new `query()` API via `src/utils/create-provider.ts`.
 
 1. Check the registry first via `getProvider(config.provider)`. If a factory exists, use it.
 2. If not registered, match against built-in provider names (`claude-code`, `codex`, `copilot`, `kimi-cli`).

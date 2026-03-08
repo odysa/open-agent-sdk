@@ -2,7 +2,7 @@
 
 Defines the `ProviderBackend` interface and built-in provider contracts.
 
-**Source:** `src/providers/types.ts`, `src/providers/{claude,codex,copilot,kimi}.ts`, `src/utils/import-provider.ts`
+**Source:** `src/providers/types.ts`, `src/providers/{claude,codex,copilot,kimi}.ts`, `src/utils/import-provider.ts`, `src/utils/create-provider.ts`
 
 ## Interface
 

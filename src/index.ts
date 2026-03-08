@@ -1,7 +1,27 @@
-// Core types
+/**
+ * one-agent-sdk — drop-in replacement for @anthropic-ai/claude-agent-sdk
+ * with multi-provider support.
+ *
+ * Usage:
+ *   import { query, tool, createSdkMcpServer } from "one-agent-sdk";
+ *
+ * 100% API-compatible with @anthropic-ai/claude-agent-sdk.
+ * Pass `options.provider` to route to a different backend (codex, copilot, kimi-cli, or custom).
+ * Defaults to claude-code when no provider is specified.
+ */
 
-// Helpers
+// ── Anthropic-compatible API (primary) ──────────────────────────────────────
+
+export * from "./sdk/claude-agent-sdk.js";
+
+// ── Legacy API (deprecated — will be removed in v0.2) ───────────────────────
+
 export { defineAgent } from "./agent.js";
+export { run, runToCompletion } from "./runner.js";
+export { defineTool } from "./tool.js";
+
+// ── Internal types & utilities ──────────────────────────────────────────────
+
 export type {
   FilterOptions,
   GuardrailsOptions,
@@ -16,7 +36,6 @@ export type {
   UsageTrackerHandle,
   UsageTrackerOptions,
 } from "./middleware/index.js";
-// Built-in middleware
 export {
   applyMiddleware,
   defineMiddleware,
@@ -28,23 +47,15 @@ export {
   timing,
   usageTracker,
 } from "./middleware/index.js";
-
-// Provider backend interface
 export type { ProviderBackend } from "./providers/types.js";
 export type { ProviderFactory } from "./registry.js";
-// Registry
 export { clearProviders, registerProvider } from "./registry.js";
-// Runner
-export { run, runToCompletion } from "./runner.js";
-// Session management
 export type { Message, Session, SessionConfig, SessionStore } from "./session.js";
 export { createSession, MemoryStore } from "./session.js";
-export { defineTool } from "./tool.js";
 export type {
   AgentDef,
   AgentRun,
   BuiltinProvider,
-  McpServerConfig,
   Middleware,
   MiddlewareContext,
   Provider,
@@ -53,5 +64,4 @@ export type {
   ToolDef,
 } from "./types.js";
 
-// Utilities
 export { zodToJsonSchema } from "./utils/zod-to-jsonschema.js";
