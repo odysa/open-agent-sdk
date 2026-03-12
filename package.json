@@ -1,6 +1,6 @@
 {
   "name": "one-agent-sdk",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Provider-agnostic SDK for building LLM agents — one API for Claude, Codex, Copilot, and Kimi",
   "keywords": [
     "ai",
