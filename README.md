@@ -10,6 +10,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/odysa/one-agent-sdk/ci.yml?style=flat-square&label=CI)](https://github.com/odysa/one-agent-sdk/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Python SDK](https://img.shields.io/badge/Python_SDK-3776AB?style=flat-square&logo=python&logoColor=white)](https://github.com/odysa/one-agent-sdk-python)
 
 **Drop-in replacement for `@anthropic-ai/claude-agent-sdk` — same API, multiple providers.**
 
@@ -290,6 +291,23 @@ The following functions are exported from `one-agent-sdk` and will be removed in
 | `runToCompletion(prompt, config)` | `query({ prompt, options })` + collect results |
 | `defineAgent({...})` | Pass agent config directly via `query()` options |
 | `defineTool({...})` | `tool(name, description, schema, handler)` |
+
+<br />
+
+## Python SDK
+
+Looking for Python? See **[one-agent-sdk-python](https://github.com/odysa/one-agent-sdk-python)** — same API, same providers, pure Python.
+
+```bash
+pip install one-agent-sdk
+```
+
+```python
+from one_agent_sdk import query, ClaudeAgentOptions
+
+async for msg in query(prompt="Hello", options=ClaudeAgentOptions(provider="codex")):
+    print(msg)
+```
 
 <br />
 
